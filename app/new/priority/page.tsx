@@ -62,10 +62,17 @@ export default function PriorityPage() {
   return (
     <main style={mainStyle}>
       {/* 상단 버튼 */}
-      <div style={topBarStyle}>
-        <button onClick={() => router.push('/')} style={navButtonStyle}>
-          ⌂ 메인
-        </button>
+      <div style={topBarStyle}> 
+        <button 
+          onClick={() => router.push('/new/coverage')} 
+          style={navButtonStyle} > 
+          ← 보장분석 
+        </button> 
+        <button 
+          onClick={() => router.push('/')} 
+          style={navButtonStyle} > 
+          ⌂ 메인 
+        </button> 
       </div>
 
       {/* 메인 카드 */}
