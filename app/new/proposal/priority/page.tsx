@@ -63,24 +63,13 @@ export default function PriorityPage() {
     <main style={mainStyle}>
       {/* 상단 버튼 */}
       <div style={topBarStyle}>
-        <button
-          onClick={() => router.push('/new/proposal')}
-          style={navButtonStyle}
-        >
-          ← 제안서 1페이지
-        </button>
-
-        <button
-          onClick={() => router.push('/')}
-          style={navButtonStyle}
-        >
+        <button onClick={() => router.push('/')} style={navButtonStyle}>
           ⌂ 메인
         </button>
       </div>
 
       {/* 메인 카드 */}
       <div style={cardStyle}>
-
         {/* 헤더 */}
         <div style={headerStyle}>
           <div style={logoCircleStyle}>🗂️</div>
@@ -113,8 +102,13 @@ export default function PriorityPage() {
           <div style={priorityListStyle}>
             {PRIORITIES.map((p) => (
               <div key={p.rank} style={priorityRowStyle}>
-
-                <div style={{ ...rankBadgeStyle, background: p.bg, color: p.color }}>
+                <div
+                  style={{
+                    ...rankBadgeStyle,
+                    background: p.bg,
+                    color: p.color,
+                  }}
+                >
                   {p.rank}순위
                 </div>
 
@@ -127,7 +121,13 @@ export default function PriorityPage() {
                   <div style={priorityItemDescStyle}>{p.desc}</div>
                 </div>
 
-                <div style={{ ...riskPillStyle, background: p.bg, color: p.color }}>
+                <div
+                  style={{
+                    ...riskPillStyle,
+                    background: p.bg,
+                    color: p.color,
+                  }}
+                >
                   위험도 {p.riskPercent}%
                 </div>
               </div>
@@ -137,7 +137,9 @@ export default function PriorityPage() {
 
         {/* 영향 박스 */}
         <div style={impactBoxStyle}>
-          <h3 style={impactTitleStyle}>⚠️ 우선순위를 뒤로 미루면 생길 수 있는 영향</h3>
+          <h3 style={impactTitleStyle}>
+            ⚠️ 우선순위를 뒤로 미루면 생길 수 있는 영향
+          </h3>
 
           <div style={impactItemStyle}>
             <span>•</span>
@@ -161,18 +163,6 @@ export default function PriorityPage() {
           </div>
         </div>
 
-        {/* 현실적인 시작 금액 */}
-        <div style={startBoxStyle}>
-          <h3 style={startTitleStyle}>💳 현실적인 시작 기준</h3>
-
-          <div style={startPriceStyle}>월 11만~13만원</div>
-
-          <div style={startDescStyle}>
-            가장 중요한 암·뇌·심장 보장을 먼저 확보하고, 수술비와 치료비는
-            예산 범위 안에서 단계적으로 보완하는 구성을 권장합니다.
-          </div>
-        </div>
-
         {/* 왜 좋은가 */}
         <div style={whyBoxStyle}>
           <h3 style={whyTitleStyle}>✅ 이런 순서로 준비하는 것이 왜 좋을까요?</h3>
@@ -189,8 +179,24 @@ export default function PriorityPage() {
 
         {/* 마무리 문구 */}
         <div style={closingStyle}>
-          오늘 바로 결정하지 않으셔도 됩니다.<br />
+          오늘 바로 결정하지 않으셔도 됩니다.
+          <br />
           먼저 우선순위를 이해하시고, 필요한 보장부터 천천히 준비하셔도 충분합니다.
+        </div>
+
+        {/* 페이지 이동 */}
+        <div style={pageNavStyle}>
+          <button
+            style={pageButtonStyle}
+            onClick={() => router.push('/new/proposal')}
+          >
+            1
+          </button>
+
+          <button style={activePageButtonStyle}>2</button>
+
+          <button style={pageButtonStyle}>3</button>
+          <button style={pageButtonStyle}>4</button>
         </div>
 
         {/* 하단 */}
@@ -213,11 +219,10 @@ const mainStyle = {
 };
 
 const topBarStyle = {
-  maxWidth: 980,
+  maxWidth: 794,
   margin: '0 auto 16px',
   display: 'flex',
   gap: 12,
-  flexWrap: 'wrap' as const,
 };
 
 const navButtonStyle = {
@@ -231,12 +236,13 @@ const navButtonStyle = {
 };
 
 const cardStyle = {
-  maxWidth: 980,
-  minHeight: 1320,
+  width: '100%',
+  maxWidth: 794,
+  minHeight: 1123,
   margin: '0 auto',
   background: 'white',
   borderRadius: 28,
-  padding: 28,
+  padding: 32,
   boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
   display: 'flex',
   flexDirection: 'column' as const,
@@ -296,7 +302,7 @@ const oneLineTextStyle = {
 };
 
 const sectionStyle = {
-  marginTop: 28,
+  marginTop: 26,
 };
 
 const sectionTitleStyle = {
@@ -389,35 +395,8 @@ const impactItemStyle = {
   marginBottom: 10,
 };
 
-const startBoxStyle = {
-  marginTop: 22,
-  background: '#ecfdf5',
-  border: '1px solid #bbf7d0',
-  borderRadius: 22,
-  padding: 22,
-};
-
-const startTitleStyle = {
-  margin: '0 0 14px',
-  color: '#047857',
-  fontSize: 18,
-};
-
-const startPriceStyle = {
-  fontSize: 34,
-  fontWeight: 800,
-  color: '#065f46',
-  margin: '6px 0 10px',
-};
-
-const startDescStyle = {
-  color: '#065f46',
-  lineHeight: 1.7,
-  fontSize: 14,
-};
-
 const whyBoxStyle = {
-  marginTop: 24,
+  marginTop: 22,
   background: '#faf5ff',
   border: '1px solid #ede9fe',
   borderRadius: 24,
@@ -451,11 +430,40 @@ const whyCheckStyle = {
 };
 
 const closingStyle = {
-  marginTop: 20,
+  marginTop: 18,
   textAlign: 'center' as const,
   color: '#64748b',
   fontSize: 13,
   lineHeight: 1.7,
+};
+
+const pageNavStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+  gap: 10,
+  marginTop: 24,
+};
+
+const pageButtonStyle = {
+  width: 40,
+  height: 40,
+  borderRadius: '50%',
+  border: '1px solid #dbe3f0',
+  background: 'white',
+  color: '#334155',
+  fontWeight: 700,
+  cursor: 'pointer',
+};
+
+const activePageButtonStyle = {
+  width: 40,
+  height: 40,
+  borderRadius: '50%',
+  border: 'none',
+  background: '#2563eb',
+  color: 'white',
+  fontWeight: 700,
+  cursor: 'default',
 };
 
 const footerStyle = {
@@ -466,6 +474,4 @@ const footerStyle = {
   justifyContent: 'space-between',
   color: '#64748b',
   fontSize: 14,
-  flexWrap: 'wrap' as const,
-  gap: 8,
 };
