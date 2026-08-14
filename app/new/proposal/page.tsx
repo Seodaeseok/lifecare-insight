@@ -269,7 +269,10 @@ export default function ProposalPage() {
             2
           </button>
 
-          <button style={disabledPageButtonStyle} disabled>
+          <button 
+            style={pageButtonStyle}
+            onClick={() => router.push('/new/plan')} 
+            >
             3
           </button>
 
