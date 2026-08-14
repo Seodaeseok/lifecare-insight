@@ -5,10 +5,19 @@ import { useRouter } from 'next/navigation';
 export default function ProposalPage() {
   const router = useRouter();
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handlePdf = () => {
+    window.print(); // PDF 저장도 브라우저 인쇄 창에서 저장
+  };
+
   return (
     <main style={mainStyle}>
       {/* 상단 버튼 */}
       <div className="no-print" style={topBarStyle}>
+        {/* 왼쪽 */}
         <div style={leftWrapStyle}>
           <button
             onClick={() => router.push('/new/coverage')}
@@ -18,6 +27,7 @@ export default function ProposalPage() {
           </button>
         </div>
 
+        {/* 가운데 */}
         <div style={centerWrapStyle}>
           <button
             onClick={() => router.push('/')}
@@ -27,7 +37,16 @@ export default function ProposalPage() {
           </button>
         </div>
 
-        <div />
+        {/* 오른쪽 */}
+        <div style={rightWrapStyle}>
+          <button onClick={handlePdf} style={navButtonStyle}>
+            📄 PDF 저장
+          </button>
+
+          <button onClick={handlePrint} style={navButtonStyle}>
+            🖨️ 인쇄
+          </button>
+        </div>
       </div>
 
       {/* A4 카드 */}
@@ -84,7 +103,7 @@ export default function ProposalPage() {
           </p>
         </div>
 
-        {/* 보완 영역 */}
+        {/* 우선 보완 영역 */}
         <div style={sectionStyle}>
           <h3 style={sectionTitleStyle}>우선 보완이 필요한 영역</h3>
 
@@ -147,11 +166,17 @@ export default function ProposalPage() {
             2
           </button>
 
-          <button style={disabledPageButtonStyle} disabled>
+          <button
+            style={pageButtonStyle}
+            onClick={() => router.push('/new/plan')}
+          >
             3
           </button>
 
-          <button style={disabledPageButtonStyle} disabled>
+          <button
+            style={pageButtonStyle}
+            onClick={() => router.push('/new/trend')}
+          >
             4
           </button>
         </div>
@@ -166,7 +191,15 @@ export default function ProposalPage() {
   );
 }
 
-/* 스타일 */
+/* 공통 본문 */
+
+const bodyTextStyle = {
+  fontSize: 13,
+  lineHeight: 1.55,
+  color: '#334155',
+};
+
+/* 레이아웃 */
 
 const mainStyle = {
   background: '#f3f6fb',
@@ -193,15 +226,22 @@ const centerWrapStyle = {
   justifyContent: 'center',
 };
 
+const rightWrapStyle = {
+  display: 'flex',
+  justifyContent: 'flex-end',
+  gap: 8,
+};
+
 const navButtonStyle = {
   background: 'white',
   border: '1px solid #dbe3f0',
   borderRadius: 14,
-  padding: '10px 16px',
+  padding: '10px 14px',
   cursor: 'pointer',
-  fontSize: 14,
+  fontSize: 13,
   fontWeight: 700,
   color: '#0f172a',
+  whiteSpace: 'nowrap' as const,
 };
 
 const cardStyle = {
@@ -217,6 +257,8 @@ const cardStyle = {
   overflow: 'hidden' as const,
   boxSizing: 'border-box' as const,
 };
+
+/* 헤더 */
 
 const headerStyle = {
   display: 'flex',
@@ -256,6 +298,8 @@ const subtitleStyle = {
   lineHeight: 1.6,
 };
 
+/* 고객 요약 */
+
 const summaryGridStyle = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
@@ -282,12 +326,14 @@ const summaryValueStyle = {
   fontSize: 15,
 };
 
+/* 핵심 진단 */
+
 const heroBoxStyle = {
   marginTop: 24,
   background: '#eff6ff',
   border: '1px solid #bfdbfe',
   borderRadius: 24,
-  padding: 22,
+  padding: 16,
 };
 
 const heroBadgeStyle = {
@@ -309,14 +355,14 @@ const heroTitleStyle = {
 };
 
 const heroTextStyle = {
+  ...bodyTextStyle,
   margin: '14px 0 0',
-  color: '#334155',
-  lineHeight: 1.7,
-  fontSize: 14,
 };
 
+/* 섹션 */
+
 const sectionStyle = {
-  marginTop: 26,
+  marginTop: 24,
 };
 
 const sectionTitleStyle = {
@@ -329,6 +375,8 @@ const gapStyle = {
   display: 'grid',
   gap: 12,
 };
+
+/* 카드 */
 
 const priorityCardStyle = {
   display: 'flex',
@@ -366,9 +414,9 @@ const priorityTitleStyle = {
 };
 
 const priorityDescStyle = {
-  color: '#64748b',
-  fontSize: 12,
+  ...bodyTextStyle,
   marginTop: 4,
+  fontSize: 12,
 };
 
 const priorityBadgePinkStyle = {
@@ -397,6 +445,8 @@ const priorityBadgeGrayStyle = {
   fontWeight: 700,
   fontSize: 12,
 };
+
+/* 페이지 이동 */
 
 const pageNavStyle = {
   display: 'flex',
@@ -427,11 +477,7 @@ const activePageButtonStyle = {
   fontWeight: 700,
 };
 
-const disabledPageButtonStyle = {
-  ...pageButtonStyle,
-  opacity: 0.4,
-  cursor: 'not-allowed',
-};
+/* 푸터 */
 
 const footerStyle = {
   marginTop: 14,
@@ -442,6 +488,8 @@ const footerStyle = {
   color: '#64748b',
   fontSize: 13,
 };
+
+/* 출력 */
 
 if (typeof window !== 'undefined') {
   const style = document.createElement('style');
