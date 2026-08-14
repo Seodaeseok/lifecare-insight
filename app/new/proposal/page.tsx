@@ -334,18 +334,19 @@ const navButtonStyle = {
   boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
 };
 
-const cardStyle = {
-  width: '100%',
-  maxWidth: 794,
-  minHeight: 1123,
-  margin: '0 auto',
-  background: 'white',
-  borderRadius: 28,
-  padding: 32,
-  boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
-  display: 'flex',
-  flexDirection: 'column' as const,
-  pageBreakAfter: 'always' as const,
+const cardStyle = { 
+  width: '794px', 
+  height: '1123px', // minHeight 말고 height 고정! 
+  margin: '0 auto', 
+  background: 'white', 
+  borderRadius: 28, 
+  padding: 28, 
+  boxShadow: '0 10px 30px rgba(15,23,42,0.08)', 
+  display: 'flex', 
+  flexDirection: 'column' as const, 
+  overflow: 'hidden' as const, // 넘치면 잘라냄 
+  boxSizing: 'border-box' as const, 
+  pageBreakAfter: 'always' as const, 
 };
 
 const headerStyle = {
@@ -509,8 +510,8 @@ const sectionStyle = {
 };
 
 const sectionTitleStyle = {
-  fontSize: 22,
-  margin: '0 0 16px',
+  fontSize: 20,
+  margin: '0 0 12px',
   color: '#0f172a',
 };
 
