@@ -16,7 +16,7 @@ const PRIORITIES = [
     rank: 2,
     icon: '🧠',
     title: '뇌혈관 진단자금',
-    desc: '뇌졸중, 뇌출혈 등 실제 발생 빈위 중심',
+    desc: '뇌졸중, 뇌출혈 등 실제 발생 빈도 중심',
     riskPercent: 25,
     color: '#7c3aed',
     bg: '#ede9fe',
@@ -63,48 +63,49 @@ export default function PriorityPage() {
     <main style={mainStyle}>
       {/* 상단 버튼 */}
       <div style={topBarStyle}>
-        <button onClick={() => router.push('/new/proposal')} style={navButtonStyle}>
+        <button
+          onClick={() => router.push('/new/proposal')}
+          style={navButtonStyle}
+        >
           ← 제안서 1페이지
         </button>
-        <button onClick={() => router.push('/')} style={navButtonStyle}>
+
+        <button
+          onClick={() => router.push('/')}
+          style={navButtonStyle}
+        >
           ⌂ 메인
         </button>
       </div>
 
       {/* 메인 카드 */}
       <div style={cardStyle}>
+
         {/* 헤더 */}
         <div style={headerStyle}>
           <div style={logoCircleStyle}>🗂️</div>
+
           <div>
-            <h1 style={titleStyle}>보험은 다 넣는 게 아니라, 순서를 정하는 것입니다</h1>
+            <h1 style={titleStyle}>
+              보험은 다 넣는 게 아니라, 순서를 정하는 것입니다
+            </h1>
+
             <p style={subtitleStyle}>
               고객님의 상황에 맞춰 가장 중요한 보장부터 우선순위로 제안합니다.
             </p>
           </div>
         </div>
 
-  const oneLineBoxStyle = { 
-        marginTop: 20, 
-        background: '#eff6ff', 
-        border: '1px solid #bfdbfe', 
-        borderRadius: 20, 
-        padding: 18, 
-        }; 
-        
-        const oneLineTitleStyle = { 
-        margin: '0 0 8px', 
-        color: '#1d4ed8', 
-        fontSize: 16, 
-        };
-        
-        const oneLineTextStyle = { 
-        margin: 0, 
-        color: '#1e3a8a', 
-        fontWeight: 700, 
-        lineHeight: 1.6, 
-        };
-     
+        {/* 고객 상황 한 줄 진단 */}
+        <div style={oneLineBoxStyle}>
+          <h3 style={oneLineTitleStyle}>💡 고객 상황 한 줄 진단</h3>
+
+          <p style={oneLineTextStyle}>
+            39세 가장 · 자녀 2명 기준, 현재는 암 치료 이후 생활비 공백과
+            가족 보호 자금이 가장 먼저 보완되어야 하는 단계입니다.
+          </p>
+        </div>
+
         {/* 우선순위 리스트 */}
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>🏆 당신에게 꼭 필요한 보장 우선순위</h2>
@@ -112,11 +113,14 @@ export default function PriorityPage() {
           <div style={priorityListStyle}>
             {PRIORITIES.map((p) => (
               <div key={p.rank} style={priorityRowStyle}>
+
                 <div style={{ ...rankBadgeStyle, background: p.bg, color: p.color }}>
                   {p.rank}순위
                 </div>
 
-                <div style={{ ...iconCircleStyle, background: p.bg }}>{p.icon}</div>
+                <div style={{ ...iconCircleStyle, background: p.bg }}>
+                  {p.icon}
+                </div>
 
                 <div style={priorityTextWrapStyle}>
                   <div style={priorityItemTitleStyle}>{p.title}</div>
@@ -131,9 +135,48 @@ export default function PriorityPage() {
           </div>
         </div>
 
+        {/* 영향 박스 */}
+        <div style={impactBoxStyle}>
+          <h3 style={impactTitleStyle}>⚠️ 우선순위를 뒤로 미루면 생길 수 있는 영향</h3>
+
+          <div style={impactItemStyle}>
+            <span>•</span>
+            <span>
+              암 치료 기간 중 소득 공백이 발생하면 생활비 부담이 커질 수 있습니다.
+            </span>
+          </div>
+
+          <div style={impactItemStyle}>
+            <span>•</span>
+            <span>
+              뇌·심장 질환은 치료 후에도 장기간 관리비가 이어질 가능성이 높습니다.
+            </span>
+          </div>
+
+          <div style={impactItemStyle}>
+            <span>•</span>
+            <span>
+              수술비가 부족하면 반복 치료 시 자기부담금 체감이 커질 수 있습니다.
+            </span>
+          </div>
+        </div>
+
+        {/* 현실적인 시작 금액 */}
+        <div style={startBoxStyle}>
+          <h3 style={startTitleStyle}>💳 현실적인 시작 기준</h3>
+
+          <div style={startPriceStyle}>월 11만~13만원</div>
+
+          <div style={startDescStyle}>
+            가장 중요한 암·뇌·심장 보장을 먼저 확보하고, 수술비와 치료비는
+            예산 범위 안에서 단계적으로 보완하는 구성을 권장합니다.
+          </div>
+        </div>
+
         {/* 왜 좋은가 */}
         <div style={whyBoxStyle}>
           <h3 style={whyTitleStyle}>✅ 이런 순서로 준비하는 것이 왜 좋을까요?</h3>
+
           <div style={whyListStyle}>
             {WHY_REASONS.map((reason, i) => (
               <div key={i} style={whyItemStyle}>
@@ -142,6 +185,12 @@ export default function PriorityPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* 마무리 문구 */}
+        <div style={closingStyle}>
+          오늘 바로 결정하지 않으셔도 됩니다.<br />
+          먼저 우선순위를 이해하시고, 필요한 보장부터 천천히 준비하셔도 충분합니다.
         </div>
 
         {/* 하단 */}
@@ -189,7 +238,7 @@ const cardStyle = {
   borderRadius: 28,
   padding: 28,
   boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
-  display: 'flex', 
+  display: 'flex',
   flexDirection: 'column' as const,
 };
 
@@ -223,6 +272,27 @@ const subtitleStyle = {
   margin: '6px 0 0',
   color: '#64748b',
   fontSize: 14,
+};
+
+const oneLineBoxStyle = {
+  marginTop: 22,
+  background: '#eff6ff',
+  border: '1px solid #bfdbfe',
+  borderRadius: 20,
+  padding: 18,
+};
+
+const oneLineTitleStyle = {
+  margin: '0 0 8px',
+  color: '#1d4ed8',
+  fontSize: 16,
+};
+
+const oneLineTextStyle = {
+  margin: 0,
+  color: '#1e3a8a',
+  fontWeight: 700,
+  lineHeight: 1.6,
 };
 
 const sectionStyle = {
@@ -295,6 +365,57 @@ const riskPillStyle = {
   flexShrink: 0,
 };
 
+const impactBoxStyle = {
+  marginTop: 22,
+  background: '#fff7ed',
+  border: '1px solid #fed7aa',
+  borderRadius: 20,
+  padding: 20,
+};
+
+const impactTitleStyle = {
+  margin: '0 0 12px',
+  color: '#c2410c',
+  fontSize: 17,
+};
+
+const impactItemStyle = {
+  display: 'flex',
+  gap: 10,
+  alignItems: 'flex-start',
+  color: '#7c2d12',
+  fontSize: 14,
+  lineHeight: 1.6,
+  marginBottom: 10,
+};
+
+const startBoxStyle = {
+  marginTop: 22,
+  background: '#ecfdf5',
+  border: '1px solid #bbf7d0',
+  borderRadius: 22,
+  padding: 22,
+};
+
+const startTitleStyle = {
+  margin: '0 0 14px',
+  color: '#047857',
+  fontSize: 18,
+};
+
+const startPriceStyle = {
+  fontSize: 34,
+  fontWeight: 800,
+  color: '#065f46',
+  margin: '6px 0 10px',
+};
+
+const startDescStyle = {
+  color: '#065f46',
+  lineHeight: 1.7,
+  fontSize: 14,
+};
+
 const whyBoxStyle = {
   marginTop: 24,
   background: '#faf5ff',
@@ -327,6 +448,14 @@ const whyCheckStyle = {
   color: '#7c3aed',
   fontWeight: 800,
   flexShrink: 0,
+};
+
+const closingStyle = {
+  marginTop: 20,
+  textAlign: 'center' as const,
+  color: '#64748b',
+  fontSize: 13,
+  lineHeight: 1.7,
 };
 
 const footerStyle = {
