@@ -93,10 +93,7 @@ export default function ProposalPage() {
         <button onClick={() => router.push('/')} style={navButtonStyle}>
           ⌂ 메인
         </button>
-        <button onClick={() => router.push('/new/proposal/priority')} style={navButtonStyle}>
-    다음 페이지 →
-  </button>
-      </div>
+              </div>
 
       {/* 메인 카드 */}
       <div style={cardStyle}>
@@ -181,6 +178,19 @@ export default function ProposalPage() {
           </p>
         </div>
 
+{/* 페이지 이동 */} 
+        <div style={pageNavStyle}> 
+          <button style={activePageButtonStyle}>1
+          </button> 
+          <button style={pageButtonStyle} 
+            onClick={() => router.push('/new/priority')} > 2 
+          </button> 
+          <button style={pageButtonStyle}>3
+          </button> 
+          <button style={pageButtonStyle}>4
+          </button> 
+        </div>
+        
         {/* 하단 */}
         <div style={footerStyle}>
           <span>1 / 4</span>
@@ -231,12 +241,16 @@ const navButtonStyle = {
 };
 
 const cardStyle = { 
-  maxWidth: 980, 
+  width: '100%', 
+  maxWidth: 794, 
+  minHeight: 1123, 
   margin: '0 auto', 
   background: 'white', 
   borderRadius: 28, 
-  padding: 28, 
+  padding: 32, 
   boxShadow: '0 10px 30px rgba(15,23,42,0.08)', 
+  display: 'flex', 
+  flexDirection: 'column' as const, 
 };
 
 const headerStyle = {
@@ -469,4 +483,33 @@ const footerStyle = {
   fontSize: 14, 
   flexWrap: 'wrap' as const, 
   gap: 8, 
+};
+
+const pageNavStyle = { 
+  display: 'flex', 
+  justifyContent: 'center', 
+  gap: 10, 
+  marginTop: 24,
+}; 
+
+const pageButtonStyle = { 
+  width: 40, 
+  height: 40, 
+  borderRadius: '50%', 
+  border: '1px solid #dbe3f0', 
+  background: 'white', 
+  color: '#334155', 
+  fontWeight: 700, 
+  cursor: 'pointer', 
+}; 
+
+const activePageButtonStyle = { 
+  width: 40, 
+  height: 40, 
+  borderRadius: '50%', 
+  border: 'none', 
+  background: '#2563eb', 
+  color: 'white', 
+  fontWeight: 700, 
+  cursor: 'default', 
 };
