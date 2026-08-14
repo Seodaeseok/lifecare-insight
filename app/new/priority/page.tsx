@@ -524,7 +524,7 @@ const footerStyle = {
 if (typeof window !== 'undefined') {
   const style = document.createElement('style');
 
-  style.innerHTML = \`
+  style.innerHTML = `
     @media print {
       body {
         background: white !important;
@@ -538,7 +538,7 @@ if (typeof window !== 'undefined') {
         padding: 0 !important;
       }
     }
-  \`;
+  `;
 
   document.head.appendChild(style);
 }
