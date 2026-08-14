@@ -21,32 +21,27 @@ ChartJS.register(
   Legend
 );
 
-const RISK_COLORS = ['#dc2626', '#ea580c', '#ea580c', '#2563eb', '#16a34a'];
-
-const REASONS = [
-  '자녀 2명으로 소득 공백 시 가족의 경제적 부담이 큼',
-  '가족력으로 인해 암 발생 위험이 상대적으로 높음',
-  '뇌혈관·심장질환은 40대 이후 발병률이 크게 증가',
-  '현재 진단자금이 부족하여 치료비와 생활비 대비 필요',
-  '월 15만원 예산으로 우선순위 중심 설계가 적합',
-];
-
 export default function ProposalPage() {
   const router = useRouter();
 
   const radarData = {
-    labels: ['암', '뇌혈관', '심장질환', '수술비', '간병·치매'],
+    labels: ['암', '뇌혈관', '심장', '수술비', '실손', '생활보장'],
     datasets: [
       {
-        label: '위험도',
-        data: [90, 72, 78, 55, 35],
-        backgroundColor: 'rgba(255, 255, 255, 0)',
+        label: '현재 보장',
+        data: [2, 2, 2, 1, 4, 2],
+        backgroundColor: 'rgba(37,99,235,0.18)',
         borderColor: '#2563eb',
-        borderWidth: 3,
+        borderWidth: 2,
         pointBackgroundColor: '#2563eb',
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 2,
-        pointRadius: 5,
+      },
+      {
+        label: '권장 수준',
+        data: [5, 5, 5, 4, 4, 4],
+        backgroundColor: 'rgba(16,185,129,0.12)',
+        borderColor: '#10b981',
+        borderWidth: 2,
+        pointBackgroundColor: '#10b981',
       },
     ],
   };
@@ -61,22 +56,21 @@ export default function ProposalPage() {
     scales: {
       r: {
         min: 0,
-        max: 100,
+        max: 5,
         ticks: {
           display: false,
-          stepSize: 20,
+          stepSize: 1,
         },
         grid: {
-          color: '#EEF2F6',
+          color: '#E5E7EB',
         },
         angleLines: {
-          color: '#EEF2F6',
+          color: '#E5E7EB',
         },
         pointLabels: {
-          color: (ctx: any) => RISK_COLORS[ctx.index] || '#334155',
+          color: '#334155',
           font: {
             size: 13,
-            weight: 'bold' as const,
           },
         },
       },
@@ -86,133 +80,211 @@ export default function ProposalPage() {
   return (
     <main style={mainStyle}>
       {/* 상단 버튼 */}
-      <div style={topBarStyle}>
-        <button 
-          onClick={() => router.push('/new/coverage')} 
-          style={navButtonStyle}>
-          ← 보장분석
-        </button>
-        <button onClick={() => router.push('/')} 
-          style={navButtonStyle}>
-          ⌂ 메인
-        </button>
-              </div>
+      <div className="no-print" style={topBarStyle}>
+        <div style={leftButtonWrapStyle}>
+          <button
+            onClick={() => router.push('/new/coverage')}
+            style={navButtonStyle}
+          >
+            🛡️ 보장분석
+          </button>
+        </div>
 
-      {/* 메인 카드 */}
+        <div style={centerButtonWrapStyle}>
+          <button
+            onClick={() => router.push('/')}
+            style={navButtonStyle}
+          >
+            ⌂ 메인
+          </button>
+        </div>
+
+        <div style={rightSpacerStyle} />
+      </div>
+
+      {/* A4 카드 */}
       <div style={cardStyle}>
         {/* 헤더 */}
         <div style={headerStyle}>
-          <div style={logoWrapStyle}>
-            <div style={logoCircleStyle}>🛡️</div>
-            <div>
-              <div style={kickerStyle}>고객님을 위한 맞춤형</div>
-              <h1 style={titleStyle}>종합보험 제안서</h1>
-              <p style={subtitleStyle}>지금의 준비가 가족의 내일을 더 든든하게 만듭니다.</p>
-            </div>
-          </div>
+          <div style={logoCircleStyle}>🛡️</div>
 
-          <div style={profileStyle}>
-            <div style={profileIconStyle}>👤</div>
-            <div>
-              <div style={profileNameStyle}>김민수님 (가명)</div>
-              <div style={profileMetaStyle}>1987년 5월 14일 · 39세 · 남성</div>
-            </div>
-          </div>
-        </div>
-
-        {/* 인적사항 */}
-        <div style={sectionStyle}>
-          <h2 style={sectionTitleStyle}>👥 고객 인적사항 및 가족 현황</h2>
-          <div style={infoGridStyle}>
-            <InfoBox icon="📅" label="연령" value="39세" />
-            <InfoBox icon="💼" label="직업" value="사무직" />
-            <InfoBox icon="👨‍👩‍👧‍👦" label="가족사항" value="배우자, 자녀 2명" />
-            <InfoBox icon="🧬" label="가족력" value="위암(모), 고혈압(부)" />
-          </div>
-        </div>
-
-        {/* 위험도 분석 */}
-        <div style={sectionStyle}>
-          <h2 style={sectionTitleStyle}>📊 주요 보장 위험도 분석</h2>
-
-          <div style={analysisGridStyle}>
-            {/* 차트 */}
-            <div style={chartCardStyle}>
-              <div style={chartWrapStyle}>
-                <Radar data={radarData} options={radarOptions} />
-              </div>
-            </div>
-
-            {/* AI 판단 */}
-            <div style={reasonCardStyle}>
-              <h3 style={reasonTitleStyle}>💡 왜 이렇게 판단했을까요?</h3>
-              <div style={reasonListStyle}>
-                {REASONS.map((reason, i) => (
-                  <div key={i} style={reasonItemStyle}>
-                    <span style={reasonCheckStyle}>✓</span>
-                    <span>{reason}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 핵심 우선순위 */}
-        <div style={priorityBoxStyle}>
-          <div style={priorityIconStyle}>🎯</div>
           <div>
-            <div style={priorityQuoteStyle}>
-              고객님에게는 &lsquo;모든 것을 다 넣는 것&rsquo;보다
-            </div>
-            <div style={priorityMainStyle}>
-              &lsquo;가장 중요한 위험부터 순서대로 준비하는 것&rsquo;이 더 현명합니다.
-            </div>
+            <div style={brandStyle}>LifeCare Insight</div>
+
+            <h1 style={titleStyle}>고객 맞춤 보장 분석 제안서</h1>
+
+            <p style={subtitleStyle}>
+              현재 보장 상태와 권장 수준을 비교하여 핵심 보완 방향을 안내드립니다.
+            </p>
           </div>
         </div>
 
-        {/* AI 요약 */}
-        <div style={summaryStyle}>
-          <h2 style={sectionTitleStyle}>🧠 AI 한 줄 요약</h2>
-          <p style={summaryTextStyle}>
-            고객님은 39세 가장으로서 치료비 자체보다 치료 이후의 생활비와 소득 공백에 대한 대비가
-            중요한 단계입니다. 현재 기본 진단비는 일부 준비되어 있으나, 최근 활용도가 높은
-            암통합치료비와 순환계치료비를 우선 보완하는 방향이 가장 효율적입니다.
+        {/* 고객 요약 */}
+        <div style={summaryGridStyle}>
+          <div style={summaryCardStyle}>
+            <div style={summaryLabelStyle}>고객</div>
+            <div style={summaryValueStyle}>홍길동</div>
+          </div>
+
+          <div style={summaryCardStyle}>
+            <div style={summaryLabelStyle}>보험나이</div>
+            <div style={summaryValueStyle}>39세</div>
+          </div>
+
+          <div style={summaryCardStyle}>
+            <div style={summaryLabelStyle}>가족구성</div>
+            <div style={summaryValueStyle}>배우자 · 자녀 2명</div>
+          </div>
+
+          <div style={summaryCardStyle}>
+            <div style={summaryLabelStyle}>실손</div>
+            <div style={summaryValueStyle}>4세대 가입</div>
+          </div>
+        </div>
+
+        {/* 핵심 진단 */}
+        <div style={heroBoxStyle}>
+          <div style={heroBadgeStyle}>핵심 진단</div>
+
+          <h2 style={heroTitleStyle}>
+            치료 이후의 생활비 공백과 가족 보호 자금이 가장 중요한 단계입니다
+          </h2>
+
+          <p style={heroTextStyle}>
+            현재 실손은 준비되어 있으나, 암·뇌·심장 영역의 진단 및 치료 과정 보장이
+            권장 수준 대비 부족하여 우선 보완이 필요한 상태로 분석됩니다.
           </p>
         </div>
 
-{/* 페이지 이동 */} 
-        <div style={pageNavStyle}> 
-          <button style={activePageButtonStyle}>1
-          </button> 
-          <button style={pageButtonStyle} 
-            onClick={() => router.push('/new/priority')} > 2 
-          </button> 
-          <button style={pageButtonStyle}>3
-          </button> 
-          <button style={pageButtonStyle}>4
-          </button> 
+        {/* 레이더 차트 */}
+        <div style={chartCardStyle}>
+          <div style={chartHeaderStyle}>
+            <div>
+              <div style={chartTitleStyle}>보장 균형 분석</div>
+              <div style={chartSubtitleStyle}>
+                현재 보장과 권장 수준을 한눈에 비교합니다
+              </div>
+            </div>
+
+            <div style={legendWrapStyle}>
+              <div style={legendItemStyle}>
+                <span style={{ ...legendDotStyle, background: '#2563eb' }} />
+                현재
+              </div>
+
+              <div style={legendItemStyle}>
+                <span style={{ ...legendDotStyle, background: '#10b981' }} />
+                권장
+              </div>
+            </div>
+          </div>
+
+          <div style={chartWrapStyle}>
+            <Radar data={radarData} options={radarOptions} />
+          </div>
         </div>
-        
-        {/* 하단 */}
+
+        {/* 우선 보완 영역 */}
+        <div style={sectionStyle}>
+          <h3 style={sectionTitleStyle}>우선 보완이 필요한 영역</h3>
+
+          <div style={gapStyle}>
+            <div style={priorityCardStyle}>
+              <div style={priorityLeftStyle}>
+                <div style={priorityIconStyle}>🎗️</div>
+
+                <div>
+                  <div style={priorityTitleStyle}>암통합치료비</div>
+                  <div style={priorityDescStyle}>
+                    비급여·표적·면역치료 등 실제 치료비 부담 대비
+                  </div>
+                </div>
+              </div>
+
+              <div style={priorityBadgePinkStyle}>우선</div>
+            </div>
+
+            <div style={priorityCardStyle}>
+              <div style={priorityLeftStyle}>
+                <div style={priorityIconStyle}>🫀</div>
+
+                <div>
+                  <div style={priorityTitleStyle}>순환계 치료비</div>
+                  <div style={priorityDescStyle}>
+                    허혈성·부정맥 포함 장기 관리 가능성 대비
+                  </div>
+                </div>
+              </div>
+
+              <div style={priorityBadgeBlueStyle}>중요</div>
+            </div>
+
+            <div style={priorityCardStyle}>
+              <div style={priorityLeftStyle}>
+                <div style={priorityIconStyle}>🏥</div>
+
+                <div>
+                  <div style={priorityTitleStyle}>질병수술비</div>
+                  <div style={priorityDescStyle}>
+                    반복 수술과 회복 과정의 자기부담금 보완
+                  </div>
+                </div>
+              </div>
+
+              <div style={priorityBadgeGrayStyle}>보완</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 설계 방향 */}
+        <div style={guideBoxStyle}>
+          <h3 style={guideTitleStyle}>권장 설계 방향</h3>
+
+          <div style={guideListStyle}>
+            <div style={guideItemStyle}>
+              <span style={guideCheckStyle}>✓</span>
+              진단자금 중심으로 핵심 위험을 먼저 확보
+            </div>
+
+            <div style={guideItemStyle}>
+              <span style={guideCheckStyle}>✓</span>
+              치료 과정에서 실제 지출이 큰 영역 우선 보완
+            </div>
+
+            <div style={guideItemStyle}>
+              <span style={guideCheckStyle}>✓</span>
+              예산 범위 내에서 단계적으로 확대하는 전략 권장
+            </div>
+          </div>
+        </div>
+
+        {/* 하단 페이지 이동 */}
+        <div className="no-print" style={pageNavStyle}>
+          <button style={activePageButtonStyle}>1</button>
+
+          <button
+            style={pageButtonStyle}
+            onClick={() => router.push('/new/priority')}
+          >
+            2
+          </button>
+
+          <button style={disabledPageButtonStyle} disabled>
+            3
+          </button>
+
+          <button style={disabledPageButtonStyle} disabled>
+            4
+          </button>
+        </div>
+
+        {/* 푸터 */}
         <div style={footerStyle}>
           <span>1 / 4</span>
           <span>LifeCare Insight · 상담용 제안서</span>
         </div>
       </div>
     </main>
-  );
-}
-
-/* 작은 컴포넌트 */
-
-function InfoBox({ icon, label, value }: { icon: string; label: string; value: string }) {
-  return (
-    <div style={infoBoxStyle}>
-      <div style={infoIconStyle}>{icon}</div>
-      <div style={infoLabelStyle}>{label}</div>
-      <div style={infoValueStyle}>{value}</div>
-    </div>
   );
 }
 
@@ -226,293 +298,391 @@ const mainStyle = {
 };
 
 const topBarStyle = {
-  maxWidth: 980,
+  maxWidth: 794,
   margin: '0 auto 16px',
+  display: 'grid',
+  gridTemplateColumns: '1fr auto 1fr',
+  alignItems: 'center',
+};
+
+const leftButtonWrapStyle = {
   display: 'flex',
-  gap: 12,
-  flexWrap: 'wrap' as const,
+  justifyContent: 'flex-start',
+};
+
+const centerButtonWrapStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+};
+
+const rightSpacerStyle = {
+  display: 'block',
 };
 
 const navButtonStyle = {
   background: 'white',
   border: '1px solid #dbe3f0',
-  borderRadius: 12,
-  padding: '10px 14px',
+  borderRadius: 14,
+  padding: '10px 16px',
   cursor: 'pointer',
   fontSize: 14,
-  fontWeight: 600,
+  fontWeight: 700,
+  color: '#0f172a',
+  boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
 };
 
-const cardStyle = { 
-  width: '100%', 
-  maxWidth: 794, 
-  minHeight: 1123, 
-  margin: '0 auto', 
-  background: 'white', 
-  borderRadius: 28, 
-  padding: 32, 
-  boxShadow: '0 10px 30px rgba(15,23,42,0.08)', 
-  display: 'flex', 
-  flexDirection: 'column' as const, 
+const cardStyle = {
+  width: '100%',
+  maxWidth: 794,
+  minHeight: 1123,
+  margin: '0 auto',
+  background: 'white',
+  borderRadius: 28,
+  padding: 32,
+  boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
+  display: 'flex',
+  flexDirection: 'column' as const,
+  pageBreakAfter: 'always' as const,
 };
 
 const headerStyle = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  gap: 20,
-  flexWrap: 'wrap' as const,
-};
-
-const logoWrapStyle = {
   display: 'flex',
   gap: 16,
   alignItems: 'center',
 };
 
 const logoCircleStyle = {
-  width: 64,
-  height: 64,
-  borderRadius: 20,
+  width: 56,
+  height: 56,
+  borderRadius: 18,
   background: '#2563eb',
   color: 'white',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontSize: 30,
+  fontSize: 26,
+  flexShrink: 0,
 };
 
-const kickerStyle = {
+const brandStyle = {
   color: '#2563eb',
-  fontWeight: 700,
+  fontWeight: 800,
   fontSize: 14,
+  marginBottom: 6,
 };
 
 const titleStyle = {
-  margin: '4px 0',
-  fontSize: 42,
-  lineHeight: 1.1,
+  margin: 0,
+  fontSize: 30,
+  lineHeight: 1.2,
   color: '#0f172a',
 };
 
 const subtitleStyle = {
-  margin: 0,
+  margin: '10px 0 0',
   color: '#64748b',
-  fontSize: 16,
+  fontSize: 15,
+  lineHeight: 1.6,
 };
 
-const profileStyle = {
-  background: '#f8fafc',
-  border: '1px solid #dbeafe',
-  borderRadius: 22,
-  padding: 16,
-  display: 'flex',
-  gap: 14,
-  alignItems: 'center',
-  minWidth: 230,
-};
-
-const profileIconStyle = {
-  width: 48,
-  height: 48,
-  borderRadius: '50%',
-  background: '#dbeafe',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 24,
-};
-
-const profileNameStyle = {
-  fontWeight: 800,
-  color: '#0f172a',
-};
-
-const profileMetaStyle = {
-  color: '#64748b',
-  fontSize: 13,
-  marginTop: 4,
-};
-
-const sectionStyle = {
-  marginTop: 28,
-};
-
-const sectionTitleStyle = {
-  fontSize: 24,
-  margin: '0 0 16px',
-  color: '#0f172a',
-};
-
-const infoGridStyle = {
+const summaryGridStyle = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-  gap: 14,
+  gridTemplateColumns: 'repeat(2, minmax(0,1fr))',
+  gap: 12,
+  marginTop: 24,
 };
 
-const infoBoxStyle = {
+const summaryCardStyle = {
   background: '#f8fafc',
   border: '1px solid #e2e8f0',
   borderRadius: 18,
-  padding: 18,
+  padding: 16,
 };
 
-const infoIconStyle = {
-  width: 36,
-  height: 36,
-  borderRadius: '50%',
-  background: '#eff6ff',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 17,
-  marginBottom: 10,
-};
-
-const infoLabelStyle = {
+const summaryLabelStyle = {
   color: '#64748b',
   fontSize: 13,
   marginBottom: 6,
 };
 
-const infoValueStyle = {
-  color: '#2563eb',
-  fontWeight: 800,
-  fontSize: 18,
+const summaryValueStyle = {
+  color: '#0f172a',
+  fontWeight: 700,
+  fontSize: 16,
 };
 
-const analysisGridStyle = {
-  display: 'grid',
-  gridTemplateColumns: '1.05fr 1fr',
-  gap: 18,
+const heroBoxStyle = {
+  marginTop: 24,
+  background: 'linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%)',
+  border: '1px solid #dbeafe',
+  borderRadius: 24,
+  padding: 24,
+};
+
+const heroBadgeStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  background: '#2563eb',
+  color: 'white',
+  borderRadius: 999,
+  padding: '6px 12px',
+  fontSize: 12,
+  fontWeight: 700,
+  marginBottom: 14,
+};
+
+const heroTitleStyle = {
+  margin: 0,
+  fontSize: 24,
+  lineHeight: 1.35,
+  color: '#0f172a',
+};
+
+const heroTextStyle = {
+  margin: '14px 0 0',
+  color: '#334155',
+  lineHeight: 1.7,
+  fontSize: 15,
 };
 
 const chartCardStyle = {
+  marginTop: 24,
   background: '#ffffff',
   border: '1px solid #e5e7eb',
   borderRadius: 24,
-  padding: 20,
+  padding: 22,
+};
+
+const chartHeaderStyle = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: 12,
+  flexWrap: 'wrap' as const,
+};
+
+const chartTitleStyle = {
+  fontWeight: 800,
+  color: '#0f172a',
+  fontSize: 18,
+};
+
+const chartSubtitleStyle = {
+  color: '#64748b',
+  fontSize: 13,
+  marginTop: 4,
+};
+
+const legendWrapStyle = {
+  display: 'flex',
+  gap: 12,
+  alignItems: 'center',
+};
+
+const legendItemStyle = {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
+  gap: 6,
+  color: '#475569',
+  fontSize: 13,
+  fontWeight: 600,
+};
+
+const legendDotStyle = {
+  width: 10,
+  height: 10,
+  borderRadius: '50%',
+  display: 'inline-block',
 };
 
 const chartWrapStyle = {
-  height: 340,
-  width: '100%',
+  height: 320,
+  marginTop: 18,
 };
 
-const reasonCardStyle = {
+const sectionStyle = {
+  marginTop: 26,
+};
+
+const sectionTitleStyle = {
+  fontSize: 22,
+  margin: '0 0 16px',
+  color: '#0f172a',
+};
+
+const gapStyle = {
+  display: 'grid',
+  gap: 14,
+};
+
+const priorityCardStyle = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  background: '#ffffff',
+  border: '1px solid #e5e7eb',
+  borderRadius: 20,
+  padding: 18,
+  gap: 14,
+  flexWrap: 'wrap' as const,
+};
+
+const priorityLeftStyle = {
+  display: 'flex',
+  gap: 14,
+  alignItems: 'center',
+  flex: 1,
+  minWidth: 220,
+};
+
+const priorityIconStyle = {
+  width: 44,
+  height: 44,
+  borderRadius: 14,
+  background: '#f8fafc',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 22,
+};
+
+const priorityTitleStyle = {
+  fontWeight: 800,
+  color: '#0f172a',
+  fontSize: 16,
+};
+
+const priorityDescStyle = {
+  color: '#64748b',
+  fontSize: 13,
+  marginTop: 4,
+};
+
+const priorityBadgePinkStyle = {
+  background: '#fce7f3',
+  color: '#be185d',
+  borderRadius: 999,
+  padding: '8px 14px',
+  fontWeight: 700,
+  fontSize: 13,
+};
+
+const priorityBadgeBlueStyle = {
+  background: '#dbeafe',
+  color: '#1d4ed8',
+  borderRadius: 999,
+  padding: '8px 14px',
+  fontWeight: 700,
+  fontSize: 13,
+};
+
+const priorityBadgeGrayStyle = {
+  background: '#f1f5f9',
+  color: '#475569',
+  borderRadius: 999,
+  padding: '8px 14px',
+  fontWeight: 700,
+  fontSize: 13,
+};
+
+const guideBoxStyle = {
+  marginTop: 24,
   background: '#faf5ff',
   border: '1px solid #ede9fe',
   borderRadius: 24,
   padding: 22,
 };
 
-const reasonTitleStyle = {
+const guideTitleStyle = {
   margin: '0 0 14px',
   color: '#6d28d9',
-  fontSize: 22,
+  fontSize: 18,
 };
 
-const reasonListStyle = {
+const guideListStyle = {
   display: 'grid',
   gap: 12,
 };
 
-const reasonItemStyle = {
+const guideItemStyle = {
   display: 'flex',
   gap: 10,
   alignItems: 'flex-start',
   color: '#334155',
-  lineHeight: 1.6,
+  lineHeight: 1.7,
+  fontSize: 14,
 };
 
-const reasonCheckStyle = {
+const guideCheckStyle = {
   color: '#7c3aed',
   fontWeight: 800,
   flexShrink: 0,
 };
 
-const priorityBoxStyle = {
-  marginTop: 24,
-  background: '#fff7ed',
-  border: '1px solid #fed7aa',
-  borderRadius: 22,
-  padding: 20,
+const pageNavStyle = {
   display: 'flex',
-  gap: 16,
-  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 10,
+  marginTop: 28,
 };
 
-const priorityIconStyle = {
-  fontSize: 34,
-};
-
-const priorityQuoteStyle = {
-  color: '#9a5b2e',
-  fontSize: 14,
-  marginBottom: 4,
-};
-
-const priorityMainStyle = {
-  color: '#7c2d12',
-  fontWeight: 800,
-  fontSize: 17,
-};
-
-const summaryStyle = {
-  marginTop: 24,
-  background: '#f8fafc',
-  border: '1px solid #e2e8f0',
-  borderRadius: 24,
-  padding: 22,
-};
-
-const summaryTextStyle = {
-  margin: 0,
+const pageButtonStyle = {
+  width: 40,
+  height: 40,
+  borderRadius: '50%',
+  border: '1px solid #dbe3f0',
+  background: 'white',
   color: '#334155',
-  lineHeight: 1.8,
-  fontSize: 16,
+  fontWeight: 700,
+  cursor: 'pointer',
 };
 
-const footerStyle = { 
-  marginTop: 28, 
-  paddingTop: 18, 
-  borderTop: '1px solid #e5e7eb', 
-  display: 'flex', 
-  justifyContent: 'space-between', 
-  color: '#64748b', 
-  fontSize: 14, 
-  flexWrap: 'wrap' as const, 
-  gap: 8, 
+const activePageButtonStyle = {
+  width: 40,
+  height: 40,
+  borderRadius: '50%',
+  border: 'none',
+  background: '#2563eb',
+  color: 'white',
+  fontWeight: 700,
+  cursor: 'default',
 };
 
-const pageNavStyle = { 
-  display: 'flex', 
-  justifyContent: 'center', 
-  gap: 10, 
-  marginTop: 24,
-}; 
-
-const pageButtonStyle = { 
-  width: 40, 
-  height: 40, 
-  borderRadius: '50%', 
-  border: '1px solid #dbe3f0', 
-  background: 'white', 
-  color: '#334155', 
-  fontWeight: 700, 
-  cursor: 'pointer', 
-}; 
-
-const activePageButtonStyle = { 
-  width: 40, 
-  height: 40, 
-  borderRadius: '50%', 
-  border: 'none', 
-  background: '#2563eb', 
-  color: 'white', 
-  fontWeight: 700, 
-  cursor: 'default', 
+const disabledPageButtonStyle = {
+  ...pageButtonStyle,
+  opacity: 0.4,
+  cursor: 'not-allowed',
 };
+
+const footerStyle = {
+  marginTop: 'auto',
+  paddingTop: 18,
+  borderTop: '1px solid #e5e7eb',
+  display: 'flex',
+  justifyContent: 'space-between',
+  color: '#64748b',
+  fontSize: 14,
+};
+
+if (typeof window !== 'undefined') {
+  const style = document.createElement('style');
+
+  style.innerHTML = `
+    @media print {
+      body {
+        background: white !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      main {
+        padding: 0 !important;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+}
