@@ -123,10 +123,8 @@ export default function ProposalPage() {
           <div style={infoGridStyle}>
             <InfoBox icon="📅" label="연령" value="39세" />
             <InfoBox icon="💼" label="직업" value="사무직" />
-            <InfoBox icon="💰" label="월소득" value="500만원" />
             <InfoBox icon="👨‍👩‍👧‍👦" label="가족사항" value="배우자, 자녀 2명" />
             <InfoBox icon="🧬" label="가족력" value="위암(모), 고혈압(부)" />
-            <InfoBox icon="🚗" label="운전" value="자가용 운전" />
           </div>
         </div>
 
