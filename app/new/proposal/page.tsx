@@ -59,7 +59,10 @@ export default function ProposalPage() {
         angleLines: { color: '#e5e7eb' },
         pointLabels: {
           color: '#334155',
-          font: { size: 11, weight: '600' as const },
+          font: {
+            size: 11,
+            weight: 600,
+          },
         },
       },
     },
@@ -335,8 +338,6 @@ const cardStyle = {
   boxSizing: 'border-box' as const,
 };
 
-/* 헤더 */
-
 const headerStyle = {
   display: 'flex',
   gap: 16,
@@ -374,8 +375,6 @@ const subtitleStyle = {
   fontSize: 14,
   lineHeight: 1.6,
 };
-
-/* 상단 그리드 */
 
 const topGridStyle = {
   display: 'grid',
@@ -417,8 +416,6 @@ const infoLabelStyle = {
   fontSize: 13,
 };
 
-/* 섹션 */
-
 const sectionStyle = {
   marginTop: 22,
 };
@@ -428,8 +425,6 @@ const sectionTitleStyle = {
   margin: '0 0 12px',
   color: '#0f172a',
 };
-
-/* 보장 수준 */
 
 const levelGridStyle = {
   display: 'grid',
@@ -461,8 +456,6 @@ const levelBadgeStyle = {
   display: 'inline-block',
 };
 
-/* 분석 */
-
 const analysisBoxStyle = {
   marginTop: 22,
   background: '#eff6ff',
@@ -482,15 +475,11 @@ const analysisTextStyle = {
   margin: 0,
 };
 
-/* 우선순위 */
-
 const priorityWrapStyle = {
   display: 'flex',
   gap: 10,
   flexWrap: 'wrap' as const,
 };
-
-/* 페이지 이동 */
 
 const pageNavStyle = {
   display: 'flex',
@@ -521,8 +510,6 @@ const activePageButtonStyle = {
   fontWeight: 700,
 };
 
-/* 푸터 */
-
 const footerStyle = {
   marginTop: 14,
   paddingTop: 14,
@@ -532,8 +519,6 @@ const footerStyle = {
   color: '#64748b',
   fontSize: 13,
 };
-
-/* 출력 */
 
 if (typeof window !== 'undefined') {
   const style = document.createElement('style');
