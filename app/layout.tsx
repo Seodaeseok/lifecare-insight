@@ -1,0 +1,1 @@
+export const metadata = { title: 'LifeCare Insight', description: '라이프사이클 기반 재무·보장 상담 리포트', }; export default function RootLayout({ children, }: { children: React.ReactNode; }) { return ( <html lang="ko"> <body>{children}</body> </html> ); }
