@@ -84,6 +84,27 @@ export default function PriorityPage() {
           </div>
         </div>
 
+  const oneLineBoxStyle = { 
+        marginTop: 20, 
+        background: '#eff6ff', 
+        border: '1px solid #bfdbfe', 
+        borderRadius: 20, 
+        padding: 18, 
+        }; 
+        
+        const oneLineTitleStyle = { 
+        margin: '0 0 8px', 
+        color: '#1d4ed8', 
+        fontSize: 16, 
+        };
+        
+        const oneLineTextStyle = { 
+        margin: 0, 
+        color: '#1e3a8a', 
+        fontWeight: 700, 
+        lineHeight: 1.6, 
+        };
+     
         {/* 우선순위 리스트 */}
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>🏆 당신에게 꼭 필요한 보장 우선순위</h2>
@@ -162,11 +183,14 @@ const navButtonStyle = {
 
 const cardStyle = {
   maxWidth: 980,
+  minHeight: 1320,
   margin: '0 auto',
   background: 'white',
   borderRadius: 28,
   padding: 28,
   boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
+  display: 'flex', 
+  flexDirection: 'column' as const,
 };
 
 const headerStyle = {
@@ -306,7 +330,7 @@ const whyCheckStyle = {
 };
 
 const footerStyle = {
-  marginTop: 28,
+  marginTop: 'auto',
   paddingTop: 18,
   borderTop: '1px solid #e5e7eb',
   display: 'flex',
