@@ -211,8 +211,10 @@ export default function PriorityPage() {
 
           <button style={activePageButtonStyle}>2</button>
 
-          <style={pageButtonStyle} 
-          onClick={() => router.push('/new/plan')} >
+        <button
+          style={pageButtonStyle} 
+          onClick={() => router.push('/new/plan')} 
+        >
             3
           </button>
 
