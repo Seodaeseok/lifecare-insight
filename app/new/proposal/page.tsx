@@ -1,23 +1,80 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { Radar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
 export default function ProposalPage() {
   const router = useRouter();
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = () => window.print();
+  const handlePdf = () => window.print();
+
+  const radarData = {
+    labels: ['암', '암통합', '뇌혈관', '심장', '수술', '실손'],
+    datasets: [
+      {
+        label: '현재 보장',
+        data: [55, 35, 65, 50, 75, 90],
+        backgroundColor: 'rgba(37,99,235,0.2)',
+        borderColor: '#2563eb',
+        borderWidth: 2,
+      },
+      {
+        label: '권장 수준',
+        data: [90, 85, 85, 85, 75, 90],
+        backgroundColor: 'rgba(239,68,68,0.12)',
+        borderColor: '#ef4444',
+        borderWidth: 2,
+      },
+    ],
   };
 
-  const handlePdf = () => {
-    window.print(); // 브라우저 PDF 저장 사용
+  const radarOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      r: {
+        suggestedMin: 0,
+        suggestedMax: 100,
+        ticks: { display: false },
+        grid: { color: '#e5e7eb' },
+        angleLines: { color: '#e5e7eb' },
+        pointLabels: {
+          color: '#334155',
+          font: { size: 11, weight: '600' as const },
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+        labels: { usePointStyle: true, boxWidth: 8 },
+      },
+    },
   };
 
   return (
     <main style={mainStyle}>
       {/* 상단 버튼 */}
       <div className="no-print" style={topBarStyle}>
-        {/* 왼쪽 */}
         <div style={leftWrapStyle}>
           <button
             onClick={() => router.push('/new/coverage')}
@@ -27,7 +84,6 @@ export default function ProposalPage() {
           </button>
         </div>
 
-        {/* 가운데 */}
         <div style={centerWrapStyle}>
           <button
             onClick={() => router.push('/')}
@@ -37,7 +93,6 @@ export default function ProposalPage() {
           </button>
         </div>
 
-        {/* 오른쪽 */}
         <div style={rightWrapStyle}>
           <button onClick={handlePdf} style={navButtonStyle}>
             📄 PDF 저장
@@ -66,114 +121,74 @@ export default function ProposalPage() {
           </div>
         </div>
 
-        {/* 고객 요약 */}
-        <div style={summaryGridStyle}>
-          <div style={summaryCardStyle}>
-            <div style={summaryLabelStyle}>고객</div>
-            <div style={summaryValueStyle}>홍길동</div>
+        {/* 고객 정보 + 차트 */}
+        <div style={topGridStyle}>
+          <div style={infoCardStyle}>
+            <h3 style={sectionTitleStyle}>고객 정보</h3>
+
+            <div style={infoRowStyle}>
+              <span style={infoLabelStyle}>고객명</span>
+              <strong>홍길동</strong>
+            </div>
+
+            <div style={infoRowStyle}>
+              <span style={infoLabelStyle}>보험나이</span>
+              <strong>39세</strong>
+            </div>
+
+            <div style={infoRowStyle}>
+              <span style={infoLabelStyle}>가족구성</span>
+              <strong>배우자 · 자녀 2명</strong>
+            </div>
+
+            <div style={infoRowStyle}>
+              <span style={infoLabelStyle}>실손</span>
+              <strong>4세대 가입</strong>
+            </div>
           </div>
 
-          <div style={summaryCardStyle}>
-            <div style={summaryLabelStyle}>보험나이</div>
-            <div style={summaryValueStyle}>39세</div>
-          </div>
+          <div style={chartCardStyle}>
+            <div style={chartTitleStyle}>보장 균형 분석</div>
 
-          <div style={summaryCardStyle}>
-            <div style={summaryLabelStyle}>가족구성</div>
-            <div style={summaryValueStyle}>배우자 · 자녀 2명</div>
-          </div>
-
-          <div style={summaryCardStyle}>
-            <div style={summaryLabelStyle}>실손</div>
-            <div style={summaryValueStyle}>4세대 가입</div>
+            <div style={{ height: 260 }}>
+              <Radar data={radarData} options={radarOptions} />
+            </div>
           </div>
         </div>
 
-        {/* 핵심 진단 */}
-        <div style={heroBoxStyle}>
-          <div style={heroBadgeStyle}>핵심 진단</div>
+        {/* 현재 보장 수준 */}
+        <div style={sectionStyle}>
+          <h3 style={sectionTitleStyle}>현재 보장 수준</h3>
 
-          <h2 style={heroTitleStyle}>
-            치료 이후의 생활비 공백과 가족 보호 자금이 가장 중요한 단계입니다
-          </h2>
+          <div style={levelGridStyle}>
+            <LevelCard title="암 진단비" level="부족" color="#ef4444" />
+            <LevelCard title="암통합치료비" level="매우 부족" color="#be123c" />
+            <LevelCard title="뇌혈관" level="보통" color="#f59e0b" />
+            <LevelCard title="허혈성 심장질환" level="부족" color="#ef4444" />
+            <LevelCard title="질병수술비" level="양호" color="#16a34a" />
+            <LevelCard title="실손의료비" level="양호" color="#16a34a" />
+          </div>
+        </div>
 
-          <p style={heroTextStyle}>
-            현재 실손은 준비되어 있으나, 암·뇌·심장 영역의 진단 및 치료 과정 보장이
-            권장 수준 대비 부족하여 우선 보완이 필요한 상태로 분석됩니다.
+        {/* AI 분석 */}
+        <div style={analysisBoxStyle}>
+          <div style={analysisTitleStyle}>🤖 AI 분석 코멘트</div>
+
+          <p style={analysisTextStyle}>
+            현재 실손은 준비되어 있으나, <strong>암통합치료비와 순환계 치료비의 공백이 가장 큽니다.</strong>
+            특히 비급여 표적·면역치료와 부정맥·시술 이후 치료비 영역은 최근 실제 체감 지출이 커지는 추세입니다.
           </p>
         </div>
 
-        {/* 우선 보완 영역 */}
+        {/* 우선순위 */}
         <div style={sectionStyle}>
-          <h3 style={sectionTitleStyle}>우선 보완이 필요한 영역</h3>
+          <h3 style={sectionTitleStyle}>우선 보완 권장 순서</h3>
 
-          <div style={gapStyle}>
-            <div style={priorityCardStyle}>
-              <div style={priorityLeftStyle}>
-                <div style={priorityIconStyle}>🎗️</div>
-
-                <div>
-                  <div style={priorityTitleStyle}>암통합치료비</div>
-                  <div style={priorityDescStyle}>
-                    비급여·표적·면역치료 등 실제 치료비 부담 대비
-                  </div>
-                </div>
-              </div>
-
-              <div style={priorityBadgePinkStyle}>우선</div>
-            </div>
-
-            <div style={priorityCardStyle}>
-              <div style={priorityLeftStyle}>
-                <div style={priorityIconStyle}>🫀</div>
-
-                <div>
-                  <div style={priorityTitleStyle}>순환계 치료비</div>
-                  <div style={priorityDescStyle}>
-                    허혈성·부정맥 포함 장기 관리 가능성 대비
-                  </div>
-                </div>
-              </div>
-
-              <div style={priorityBadgeBlueStyle}>중요</div>
-            </div>
-
-            <div style={priorityCardStyle}>
-              <div style={priorityLeftStyle}>
-                <div style={priorityIconStyle}>🏥</div>
-
-                <div>
-                  <div style={priorityTitleStyle}>질병수술비</div>
-                  <div style={priorityDescStyle}>
-                    반복 수술과 회복 과정의 자기부담금 보완
-                  </div>
-                </div>
-              </div>
-
-              <div style={priorityBadgeGrayStyle}>보완</div>
-            </div>
-          </div>
-        </div>
-
-        {/* 권장 설계 방향 */}
-        <div style={guideBoxStyle}>
-          <h3 style={guideTitleStyle}>권장 설계 방향</h3>
-
-          <div style={guideListStyle}>
-            <div style={guideItemStyle}>
-              <span style={guideCheckStyle}>✓</span>
-              <span>진단자금 중심으로 핵심 위험을 먼저 확보</span>
-            </div>
-
-            <div style={guideItemStyle}>
-              <span style={guideCheckStyle}>✓</span>
-              <span>치료 과정에서 실제 지출이 큰 영역 우선 보완</span>
-            </div>
-
-            <div style={guideItemStyle}>
-              <span style={guideCheckStyle}>✓</span>
-              <span>예산 범위 내에서 단계적으로 확대하는 전략 권장</span>
-            </div>
+          <div style={priorityWrapStyle}>
+            <PriorityPill label="1 암통합치료비" bg="#fee2e2" color="#b91c1c" />
+            <PriorityPill label="2 순환계 치료비" bg="#fef3c7" color="#92400e" />
+            <PriorityPill label="3 뇌혈관" bg="#dbeafe" color="#1d4ed8" />
+            <PriorityPill label="4 질병수술비" bg="#dcfce7" color="#166534" />
           </div>
         </div>
 
@@ -213,7 +228,59 @@ export default function ProposalPage() {
   );
 }
 
-/* 공통 본문 */
+/* 컴포넌트 */
+
+function LevelCard({
+  title,
+  level,
+  color,
+}: {
+  title: string;
+  level: string;
+  color: string;
+}) {
+  return (
+    <div style={levelCardStyle}>
+      <div style={levelTitleStyle}>{title}</div>
+
+      <div
+        style={{
+          ...levelBadgeStyle,
+          background: color,
+        }}
+      >
+        {level}
+      </div>
+    </div>
+  );
+}
+
+function PriorityPill({
+  label,
+  bg,
+  color,
+}: {
+  label: string;
+  bg: string;
+  color: string;
+}) {
+  return (
+    <div
+      style={{
+        background: bg,
+        color,
+        borderRadius: 999,
+        padding: '10px 16px',
+        fontWeight: 700,
+        fontSize: 13,
+      }}
+    >
+      {label}
+    </div>
+  );
+}
+
+/* 공통 */
 
 const bodyTextStyle = {
   fontSize: 13,
@@ -238,21 +305,9 @@ const topBarStyle = {
   alignItems: 'center',
 };
 
-const leftWrapStyle = {
-  display: 'flex',
-  justifyContent: 'flex-start',
-};
-
-const centerWrapStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-};
-
-const rightWrapStyle = {
-  display: 'flex',
-  justifyContent: 'flex-end',
-  gap: 8,
-};
+const leftWrapStyle = { display: 'flex', justifyContent: 'flex-start' };
+const centerWrapStyle = { display: 'flex', justifyContent: 'center' };
+const rightWrapStyle = { display: 'flex', justifyContent: 'flex-end', gap: 8 };
 
 const navButtonStyle = {
   background: 'white',
@@ -320,186 +375,119 @@ const subtitleStyle = {
   lineHeight: 1.6,
 };
 
-/* 고객 요약 */
+/* 상단 그리드 */
 
-const summaryGridStyle = {
+const topGridStyle = {
   display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  gap: 12,
+  gridTemplateColumns: '1fr 1.2fr',
+  gap: 16,
   marginTop: 24,
 };
 
-const summaryCardStyle = {
+const infoCardStyle = {
   background: '#f8fafc',
   border: '1px solid #e2e8f0',
-  borderRadius: 18,
+  borderRadius: 22,
   padding: 16,
 };
 
-const summaryLabelStyle = {
+const chartCardStyle = {
+  background: '#ffffff',
+  border: '1px solid #e5e7eb',
+  borderRadius: 22,
+  padding: 16,
+};
+
+const chartTitleStyle = {
+  fontWeight: 700,
+  color: '#0f172a',
+  marginBottom: 12,
+};
+
+const infoRowStyle = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '12px 0',
+  borderBottom: '1px solid #e5e7eb',
+};
+
+const infoLabelStyle = {
   color: '#64748b',
-  fontSize: 12,
-  marginBottom: 6,
-};
-
-const summaryValueStyle = {
-  color: '#0f172a',
-  fontWeight: 700,
-  fontSize: 15,
-};
-
-/* 핵심 진단 */
-
-const heroBoxStyle = {
-  marginTop: 24,
-  background: '#eff6ff',
-  border: '1px solid #bfdbfe',
-  borderRadius: 24,
-  padding: 16,
-};
-
-const heroBadgeStyle = {
-  display: 'inline-block',
-  background: '#2563eb',
-  color: 'white',
-  borderRadius: 999,
-  padding: '6px 12px',
-  fontSize: 12,
-  fontWeight: 700,
-  marginBottom: 14,
-};
-
-const heroTitleStyle = {
-  margin: 0,
-  fontSize: 24,
-  lineHeight: 1.35,
-  color: '#0f172a',
-};
-
-const heroTextStyle = {
-  ...bodyTextStyle,
-  margin: '14px 0 0',
+  fontSize: 13,
 };
 
 /* 섹션 */
 
 const sectionStyle = {
-  marginTop: 24,
+  marginTop: 22,
 };
 
 const sectionTitleStyle = {
-  fontSize: 20,
-  margin: '0 0 14px',
+  fontSize: 18,
+  margin: '0 0 12px',
   color: '#0f172a',
 };
 
-const gapStyle = {
+/* 보장 수준 */
+
+const levelGridStyle = {
   display: 'grid',
+  gridTemplateColumns: '1fr 1fr 1fr',
   gap: 12,
 };
 
-/* 카드 */
-
-const priorityCardStyle = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
+const levelCardStyle = {
   background: '#ffffff',
   border: '1px solid #e5e7eb',
-  borderRadius: 20,
+  borderRadius: 18,
   padding: 16,
-  gap: 12,
+  textAlign: 'center' as const,
 };
 
-const priorityLeftStyle = {
-  display: 'flex',
-  gap: 14,
-  alignItems: 'center',
-  flex: 1,
-};
-
-const priorityIconStyle = {
-  width: 44,
-  height: 44,
-  borderRadius: 14,
-  background: '#f8fafc',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 22,
-};
-
-const priorityTitleStyle = {
-  fontWeight: 800,
+const levelTitleStyle = {
+  fontWeight: 700,
   color: '#0f172a',
-  fontSize: 15,
+  fontSize: 14,
+  marginBottom: 10,
 };
 
-const priorityDescStyle = {
-  ...bodyTextStyle,
-  marginTop: 4,
-  fontSize: 12,
-};
-
-const priorityBadgePinkStyle = {
-  background: '#fce7f3',
-  color: '#be185d',
+const levelBadgeStyle = {
+  color: 'white',
   borderRadius: 999,
-  padding: '7px 12px',
+  padding: '6px 12px',
   fontWeight: 700,
   fontSize: 12,
+  display: 'inline-block',
 };
 
-const priorityBadgeBlueStyle = {
-  background: '#dbeafe',
-  color: '#1d4ed8',
-  borderRadius: 999,
-  padding: '7px 12px',
-  fontWeight: 700,
-  fontSize: 12,
-};
+/* 분석 */
 
-const priorityBadgeGrayStyle = {
-  background: '#f1f5f9',
-  color: '#475569',
-  borderRadius: 999,
-  padding: '7px 12px',
-  fontWeight: 700,
-  fontSize: 12,
-};
-
-/* 권장 설계 */
-
-const guideBoxStyle = {
-  marginTop: 24,
-  background: '#faf5ff',
-  border: '1px solid #ede9fe',
-  borderRadius: 24,
+const analysisBoxStyle = {
+  marginTop: 22,
+  background: '#eff6ff',
+  border: '1px solid #bfdbfe',
+  borderRadius: 22,
   padding: 16,
 };
 
-const guideTitleStyle = {
-  margin: '0 0 12px',
-  color: '#6d28d9',
-  fontSize: 18,
+const analysisTitleStyle = {
+  fontWeight: 800,
+  color: '#1d4ed8',
+  marginBottom: 10,
 };
 
-const guideListStyle = {
-  display: 'grid',
-  gap: 10,
+const analysisTextStyle = {
+  ...bodyTextStyle,
+  margin: 0,
 };
 
-const guideItemStyle = {
+/* 우선순위 */
+
+const priorityWrapStyle = {
   display: 'flex',
   gap: 10,
-  alignItems: 'flex-start',
-  ...bodyTextStyle,
-};
-
-const guideCheckStyle = {
-  color: '#7c3aed',
-  fontWeight: 800,
-  flexShrink: 0,
+  flexWrap: 'wrap' as const,
 };
 
 /* 페이지 이동 */
@@ -509,7 +497,7 @@ const pageNavStyle = {
   justifyContent: 'center',
   gap: 10,
   marginTop: 'auto',
-  paddingTop: 18,
+  paddingTop: 16,
 };
 
 const pageButtonStyle = {
