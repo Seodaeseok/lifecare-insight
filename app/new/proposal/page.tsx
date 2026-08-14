@@ -93,6 +93,9 @@ export default function ProposalPage() {
         <button onClick={() => router.push('/')} style={navButtonStyle}>
           ⌂ 메인
         </button>
+        <button onClick={() => router.push('/new/proposal/priority')} style={navButtonStyle}>
+    다음 페이지 →
+  </button>
       </div>
 
       {/* 메인 카드 */}
