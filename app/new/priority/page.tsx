@@ -62,17 +62,26 @@ export default function PriorityPage() {
   return (
     <main style={mainStyle}>
       {/* 상단 버튼 */}
-      <div style={topBarStyle}> 
-        <button 
-          onClick={() => router.push('/new/coverage')} 
-          style={navButtonStyle} > 
-          ← 보장분석 
-        </button> 
-        <button 
-          onClick={() => router.push('/')} 
-          style={navButtonStyle} > 
-          ⌂ 메인 
-        </button> 
+      <div className="no-print" style={topBarStyle}>
+        <div style={leftButtonWrapStyle}>
+          <button
+            onClick={() => router.push('/new/coverage')}
+            style={navButtonStyle}
+          >
+            🛡️ 보장분석
+          </button>
+        </div>
+
+        <div style={centerButtonWrapStyle}>
+          <button
+            onClick={() => router.push('/')}
+            style={navButtonStyle}
+          >
+            ⌂ 메인
+          </button>
+        </div>
+
+        <div style={rightSpacerStyle} />
       </div>
 
       {/* 메인 카드 */}
@@ -192,7 +201,7 @@ export default function PriorityPage() {
         </div>
 
         {/* 페이지 이동 */}
-        <div style={pageNavStyle}>
+        <div className="no-print" style={pageNavStyle}>
           <button
             style={pageButtonStyle}
             onClick={() => router.push('/new/proposal')}
@@ -202,8 +211,13 @@ export default function PriorityPage() {
 
           <button style={activePageButtonStyle}>2</button>
 
-          <button style={pageButtonStyle}>3</button>
-          <button style={pageButtonStyle}>4</button>
+          <button style={disabledPageButtonStyle} disabled>
+            3
+          </button>
+
+          <button style={disabledPageButtonStyle} disabled>
+            4
+          </button>
         </div>
 
         {/* 하단 */}
@@ -228,18 +242,35 @@ const mainStyle = {
 const topBarStyle = {
   maxWidth: 794,
   margin: '0 auto 16px',
+  display: 'grid',
+  gridTemplateColumns: '1fr auto 1fr',
+  alignItems: 'center',
+};
+
+const leftButtonWrapStyle = {
   display: 'flex',
-  gap: 12,
+  justifyContent: 'flex-start',
+};
+
+const centerButtonWrapStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+};
+
+const rightSpacerStyle = {
+  display: 'block',
 };
 
 const navButtonStyle = {
   background: 'white',
   border: '1px solid #dbe3f0',
-  borderRadius: 12,
-  padding: '10px 14px',
+  borderRadius: 14,
+  padding: '10px 16px',
   cursor: 'pointer',
   fontSize: 14,
-  fontWeight: 600,
+  fontWeight: 700,
+  color: '#0f172a',
+  boxShadow: '0 1px 2px rgba(15,23,42,0.04)',
 };
 
 const cardStyle = {
@@ -253,6 +284,7 @@ const cardStyle = {
   boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
   display: 'flex',
   flexDirection: 'column' as const,
+  pageBreakAfter: 'always' as const,
 };
 
 const headerStyle = {
@@ -473,6 +505,12 @@ const activePageButtonStyle = {
   cursor: 'default',
 };
 
+const disabledPageButtonStyle = {
+  ...pageButtonStyle,
+  opacity: 0.4,
+  cursor: 'not-allowed',
+};
+
 const footerStyle = {
   marginTop: 'auto',
   paddingTop: 18,
@@ -482,3 +520,25 @@ const footerStyle = {
   color: '#64748b',
   fontSize: 14,
 };
+
+if (typeof window !== 'undefined') {
+  const style = document.createElement('style');
+
+  style.innerHTML = \`
+    @media print {
+      body {
+        background: white !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      main {
+        padding: 0 !important;
+      }
+    }
+  \`;
+
+  document.head.appendChild(style);
+}
