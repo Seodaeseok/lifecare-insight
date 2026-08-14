@@ -230,13 +230,16 @@ const navButtonStyle = {
   fontWeight: 600,
 };
 
-const cardStyle = {
-  maxWidth: 980,
-  margin: '0 auto',
-  background: 'white',
-  borderRadius: 28,
-  padding: 28,
-  boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
+const cardStyle = { 
+  maxWidth: 980, 
+  minHeight: 1320, // 추가 
+  margin: '0 auto', 
+  background: 'white', 
+  borderRadius: 28, 
+  padding: 28, 
+  boxShadow: '0 10px 30px rgba(15,23,42,0.08)', 
+  display: 'flex', 
+  flexDirection: 'column' as const,
 };
 
 const headerStyle = {
@@ -459,14 +462,14 @@ const summaryTextStyle = {
   fontSize: 16,
 };
 
-const footerStyle = {
-  marginTop: 28,
-  paddingTop: 18,
-  borderTop: '1px solid #e5e7eb',
-  display: 'flex',
-  justifyContent: 'space-between',
-  color: '#64748b',
-  fontSize: 14,
-  flexWrap: 'wrap' as const,
-  gap: 8,
+const footerStyle = { 
+  marginTop: 'auto', // 변경 
+  paddingTop: 18, 
+  borderTop: '1px solid #e5e7eb', 
+  display: 'flex', 
+  justifyContent: 'space-between', 
+  color: '#64748b', 
+  fontSize: 14, 
+  flexWrap: 'wrap' as const, 
+  gap: 8, 
 };
