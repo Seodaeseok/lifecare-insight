@@ -10,7 +10,7 @@ export default function ProposalPage() {
   };
 
   const handlePdf = () => {
-    window.print(); // PDF 저장도 브라우저 인쇄 창에서 저장
+    window.print(); // 브라우저 PDF 저장 사용
   };
 
   return (
@@ -151,6 +151,28 @@ export default function ProposalPage() {
               </div>
 
               <div style={priorityBadgeGrayStyle}>보완</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 권장 설계 방향 */}
+        <div style={guideBoxStyle}>
+          <h3 style={guideTitleStyle}>권장 설계 방향</h3>
+
+          <div style={guideListStyle}>
+            <div style={guideItemStyle}>
+              <span style={guideCheckStyle}>✓</span>
+              <span>진단자금 중심으로 핵심 위험을 먼저 확보</span>
+            </div>
+
+            <div style={guideItemStyle}>
+              <span style={guideCheckStyle}>✓</span>
+              <span>치료 과정에서 실제 지출이 큰 영역 우선 보완</span>
+            </div>
+
+            <div style={guideItemStyle}>
+              <span style={guideCheckStyle}>✓</span>
+              <span>예산 범위 내에서 단계적으로 확대하는 전략 권장</span>
             </div>
           </div>
         </div>
@@ -444,6 +466,40 @@ const priorityBadgeGrayStyle = {
   padding: '7px 12px',
   fontWeight: 700,
   fontSize: 12,
+};
+
+/* 권장 설계 */
+
+const guideBoxStyle = {
+  marginTop: 24,
+  background: '#faf5ff',
+  border: '1px solid #ede9fe',
+  borderRadius: 24,
+  padding: 16,
+};
+
+const guideTitleStyle = {
+  margin: '0 0 12px',
+  color: '#6d28d9',
+  fontSize: 18,
+};
+
+const guideListStyle = {
+  display: 'grid',
+  gap: 10,
+};
+
+const guideItemStyle = {
+  display: 'flex',
+  gap: 10,
+  alignItems: 'flex-start',
+  ...bodyTextStyle,
+};
+
+const guideCheckStyle = {
+  color: '#7c3aed',
+  fontWeight: 800,
+  flexShrink: 0,
 };
 
 /* 페이지 이동 */
