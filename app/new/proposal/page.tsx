@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -12,7 +10,6 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-
 import { Radar } from 'react-chartjs-2';
 
 ChartJS.register(
@@ -25,824 +22,344 @@ ChartJS.register(
 );
 
 /* =========================================================
-   고객 기본 정보
+   기본 고객 정보
+   ---------------------------------------------------------
+   추후 Supabase 고객정보와 연결하면 이 부분을
+   고객 데이터로 교체하면 됩니다.
 ========================================================= */
 
-type CustomerInfo = {
-  name: string;
-  age: number;
-  gender: string;
-  occupation: string;
-  spouse: string;
-  children: string;
-  familyHistory: string;
+const customer = {
+  name: '김민수',
+  age: 38,
+  gender: '남성',
+  job: '사무직',
+  family: '배우자, 자녀 2명',
+  familyHistory: '부친 고혈압 / 모친 당뇨',
+  driving: '자가용 운전',
 };
 
 /* =========================================================
    보장 데이터
+   ---------------------------------------------------------
+   current  : 현재 가입금액
+   ai       : AI 권장금액
+   advisor  : 설계사 권장금액
 ========================================================= */
 
-type CoverageData = {
-  cancer: number;
-  brain: number;
-  heart: number;
-  surgery: number;
-  accident: number;
+const coverageData = [
+  {
+    key: 'cancer',
+    label: '암',
+    current: 3000,
+    ai: 5000,
+    advisor: 5000,
+    risk: 88,
+    level: '매우 높음',
+    color: '#ef4444',
+  },
+  {
+    key: 'brain',
+    label: '뇌혈관',
+    current: 1000,
+    ai: 3000,
+    advisor: 3000,
+    risk: 72,
+    level: '높음',
+    color: '#f97316',
+  },
+  {
+    key: 'heart',
+    label: '심혈관',
+    current: 1000,
+    ai: 3000,
+    advisor: 3000,
+    risk: 68,
+    level: '높음',
+    color: '#f97316',
+  },
+  {
+    key: 'surgery',
+    label: '수술비',
+    current: 300,
+    ai: 500,
+    advisor: 500,
+    risk: 45,
+    level: '중간',
+    color: '#2563eb',
+  },
+  {
+    key: 'injury',
+    label: '상해·후유장해',
+    current: 2000,
+    ai: 3000,
+    advisor: 3000,
+    risk: 35,
+    level: '낮음',
+    color: '#16a34a',
+  },
+];
+
+/* =========================================================
+   위험도 분석 이유
+========================================================= */
+
+const riskReasons = [
+  {
+    title: '암',
+    level: '매우 높음',
+    text: '38세는 경제활동과 가족에 대한 책임이 큰 시기이며, 암 발생 시 치료비뿐 아니라 장기간의 소득 공백까지 고려할 필요가 있습니다.',
+  },
+  {
+    title: '뇌혈관',
+    level: '높음',
+    text: '가족력과 연령을 함께 고려할 경우 향후 뇌혈관질환에 대한 대비 필요성이 커집니다. 현재 가입금액도 추가적인 보완 여지가 있습니다.',
+  },
+  {
+    title: '심혈관',
+    level: '높음',
+    text: '심혈관질환은 진단 이후 치료기간과 회복기간 동안 발생할 수 있는 경제적 부담을 함께 고려해야 합니다.',
+  },
+  {
+    title: '수술비',
+    level: '중간',
+    text: '현재 기본적인 수술비 보장은 있으나 반복적인 수술이나 다양한 질병·상해 상황까지 고려하면 일정 수준의 추가 보완이 필요합니다.',
+  },
+  {
+    title: '상해·후유장해',
+    level: '낮음',
+    text: '현재 가입금액이 기본적인 위험에 대응할 수 있는 수준으로 판단되어 상대적으로 우선순위는 낮게 평가했습니다.',
+  },
+];
+
+/* =========================================================
+   AI 종합 분석
+========================================================= */
+
+const aiComment =
+  '현재 보장은 암·뇌혈관·심혈관 등 주요 질병에 대한 기본적인 준비가 되어 있지만, 가족의 경제적 책임과 향후 치료비 및 소득공백까지 고려하면 핵심 진단비를 중심으로 보완할 필요가 있습니다. 특히 암 보장은 현재 가입금액이 일부 확보되어 있으나 경제적 영향이 큰 위험인 만큼 우선적으로 점검하는 것이 좋습니다. 뇌혈관·심혈관 보장은 현재 가입금액과 권장금액의 차이를 확인하여 예산 범위 안에서 단계적으로 보완하는 방향을 권장합니다.';
+
+/* =========================================================
+   Radar Chart
+   ========================================================= */
+
+const radarData = {
+  labels: ['암', '뇌혈관', '심혈관', '수술비', '상해·후유장해'],
+  datasets: [
+    {
+      label: '현재 위험도',
+      data: coverageData.map((item) => item.risk),
+      backgroundColor: 'rgba(37, 99, 235, 0.16)',
+      borderColor: '#2563eb',
+      borderWidth: 3,
+      pointBackgroundColor: '#2563eb',
+      pointBorderColor: '#ffffff',
+      pointBorderWidth: 2,
+      pointRadius: 5,
+    },
+  ],
+};
+
+/*
+  Chart.js 버전별 타입 충돌을 피하기 위해 any 사용
+*/
+
+const radarOptions: any = {
+  responsive: true,
+  maintainAspectRatio: false,
+
+  scales: {
+    r: {
+      min: 0,
+      max: 100,
+
+      ticks: {
+        display: false,
+      },
+
+      grid: {
+        color: '#dbeafe',
+      },
+
+      angleLines: {
+        color: '#dbeafe',
+      },
+
+      pointLabels: {
+        color: '#0f172a',
+
+        font: {
+          size: 15,
+          weight: 600,
+        },
+
+        padding: 12,
+      },
+    },
+  },
+
+  plugins: {
+    legend: {
+      display: false,
+    },
+
+    tooltip: {
+      callbacks: {
+        label: function (context: any) {
+          return ` 위험도 ${context.raw}%`;
+        },
+      },
+    },
+  },
 };
 
 /* =========================================================
-   위험도 데이터
+   공통 버튼
 ========================================================= */
 
-const riskData = {
-  cancer: 90,
-  brain: 78,
-  heart: 68,
-  surgery: 52,
-  accident: 32,
-};
+function NavigationButtons() {
+  const router = useRouter();
 
-/* =========================================================
-   권장 보장금액
-   실제 서비스에서는 추후 AI 추천금액 / 설계사 추천금액과 연결
-========================================================= */
+  return (
+    <div className="no-print" style={topBarStyle}>
+      <div style={leftButtonsStyle}>
+        <button
+          onClick={() => router.push('/new/coverage')}
+          style={navButtonStyle}
+        >
+          🛡️ 보장분석
+        </button>
+      </div>
 
-const recommendedCoverage = {
-  cancer: 5000,
-  brain: 3000,
-  heart: 3000,
-  surgery: 1000,
-  accident: 1000,
-};
+      <div style={centerButtonStyle}>
+        <button onClick={() => router.push('/')} style={navButtonStyle}>
+          🏠 메인
+        </button>
+      </div>
 
-/* =========================================================
-   기본 현재 가입금액
-   보장분석 페이지에서 저장된 데이터가 있으면 그것을 사용
-========================================================= */
-
-const defaultCoverage: CoverageData = {
-  cancer: 3000,
-  brain: 1000,
-  heart: 1000,
-  surgery: 500,
-  accident: 300,
-};
-
-/* =========================================================
-   스타일
-========================================================= */
-
-const mainStyle: React.CSSProperties = {
-  minHeight: '100vh',
-  background: '#eef3f9',
-  padding: '20px',
-  fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif',
-  color: '#0f172a',
-};
-
-const topBarStyle: React.CSSProperties = {
-  width: '100%',
-  maxWidth: '210mm',
-  margin: '0 auto 14px',
-  display: 'grid',
-  gridTemplateColumns: '1fr auto 1fr',
-  alignItems: 'center',
-  gap: 10,
-};
-
-const leftButtonsStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'flex-start',
-  gap: 8,
-};
-
-const centerButtonsStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'center',
-};
-
-const rightButtonsStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'flex-end',
-  gap: 8,
-};
-
-const buttonStyle: React.CSSProperties = {
-  border: '1px solid #dbe3ef',
-  background: '#ffffff',
-  color: '#334155',
-  borderRadius: 10,
-  padding: '9px 13px',
-  fontSize: 13,
-  fontWeight: 700,
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-};
-
-const mainButtonStyle: React.CSSProperties = {
-  ...buttonStyle,
-  background: '#2563eb',
-  borderColor: '#2563eb',
-  color: '#ffffff',
-};
-
-const pdfButtonStyle: React.CSSProperties = {
-  ...buttonStyle,
-  background: '#f8fafc',
-};
-
-const printButtonStyle: React.CSSProperties = {
-  ...buttonStyle,
-  background: '#0f172a',
-  color: '#ffffff',
-  borderColor: '#0f172a',
-};
-
-const pageStyle: React.CSSProperties = {
-  width: '210mm',
-  height: '297mm',
-  maxWidth: '100%',
-  margin: '0 auto',
-  background: '#ffffff',
-  boxSizing: 'border-box',
-  padding: '9mm',
-  overflow: 'hidden',
-  boxShadow: '0 8px 30px rgba(15, 23, 42, 0.10)',
-};
-
-const pageHeaderStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  marginBottom: 12,
-};
-
-const logoAreaStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 10,
-};
-
-const logoStyle: React.CSSProperties = {
-  width: 40,
-  height: 40,
-  borderRadius: 12,
-  background: '#2563eb',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: '#ffffff',
-  fontSize: 22,
-  flexShrink: 0,
-};
-
-const smallTitleStyle: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 800,
-  color: '#2563eb',
-  marginBottom: 2,
-};
-
-const mainTitleStyle: React.CSSProperties = {
-  margin: 0,
-  fontSize: 22,
-  lineHeight: 1.2,
-  fontWeight: 900,
-  color: '#0f172a',
-};
-
-const headerDescriptionStyle: React.CSSProperties = {
-  margin: '4px 0 0',
-  fontSize: 11,
-  color: '#64748b',
-};
-
-const customerBoxStyle: React.CSSProperties = {
-  minWidth: 170,
-  background: '#f5f8ff',
-  border: '1px solid #e0e9ff',
-  borderRadius: 12,
-  padding: '9px 12px',
-};
-
-const customerNameStyle: React.CSSProperties = {
-  fontSize: 14,
-  fontWeight: 900,
-  color: '#0f172a',
-};
-
-const customerMetaStyle: React.CSSProperties = {
-  marginTop: 3,
-  fontSize: 10,
-  color: '#64748b',
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  margin: 0,
-  fontSize: 14,
-  fontWeight: 900,
-  color: '#0f172a',
-};
-
-const sectionTitleWrapStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 7,
-  marginBottom: 7,
-};
-
-const blueBarStyle: React.CSSProperties = {
-  width: 4,
-  height: 18,
-  borderRadius: 4,
-  background: '#2563eb',
-};
-
-const customerInfoStyle: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(5, 1fr)',
-  border: '1px solid #dbe5f5',
-  borderRadius: 12,
-  overflow: 'hidden',
-  background: '#ffffff',
-};
-
-const infoItemStyle: React.CSSProperties = {
-  padding: '8px 7px',
-  textAlign: 'center',
-  borderRight: '1px solid #e5eaf2',
-};
-
-const infoLabelStyle: React.CSSProperties = {
-  fontSize: 9,
-  color: '#64748b',
-  marginBottom: 4,
-};
-
-const infoValueStyle: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 800,
-  color: '#0f172a',
-};
-
-const analysisSectionStyle: React.CSSProperties = {
-  marginTop: 12,
-};
-
-const analysisGridStyle: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '1.05fr 0.95fr',
-  gap: 10,
-  alignItems: 'stretch',
-};
-
-const chartCardStyle: React.CSSProperties = {
-  border: '1px solid #dbe5f5',
-  borderRadius: 14,
-  padding: 10,
-  background: '#ffffff',
-  minHeight: 305,
-  boxSizing: 'border-box',
-};
-
-const chartTitleStyle: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 800,
-  color: '#334155',
-  marginBottom: 4,
-};
-
-const explanationCardStyle: React.CSSProperties = {
-  borderRadius: 14,
-  background: '#faf5ff',
-  border: '1px solid #eadcff',
-  padding: 13,
-  minHeight: 305,
-  boxSizing: 'border-box',
-};
-
-const explanationTitleStyle: React.CSSProperties = {
-  margin: '0 0 8px',
-  fontSize: 14,
-  fontWeight: 900,
-  color: '#6d28d9',
-};
-
-const explanationItemStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: 7,
-  marginBottom: 8,
-  alignItems: 'flex-start',
-};
-
-const explanationIconStyle: React.CSSProperties = {
-  width: 18,
-  height: 18,
-  borderRadius: '50%',
-  background: '#7c3aed',
-  color: '#ffffff',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 10,
-  fontWeight: 900,
-  flexShrink: 0,
-};
-
-const explanationTextStyle: React.CSSProperties = {
-  fontSize: 10.5,
-  lineHeight: 1.45,
-  color: '#334155',
-};
-
-const coverageSummaryStyle: React.CSSProperties = {
-  marginTop: 9,
-  borderTop: '1px solid #e2e8f0',
-  paddingTop: 8,
-};
-
-const coverageSummaryTitleStyle: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 900,
-  color: '#334155',
-  marginBottom: 5,
-};
-
-const coverageSummaryGridStyle: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(5, 1fr)',
-  gap: 5,
-};
-
-const coverageMiniStyle: React.CSSProperties = {
-  borderRadius: 8,
-  background: '#f8fafc',
-  padding: '5px 4px',
-  textAlign: 'center',
-};
-
-const coverageMiniLabelStyle: React.CSSProperties = {
-  fontSize: 8,
-  color: '#64748b',
-};
-
-const coverageMiniValueStyle: React.CSSProperties = {
-  marginTop: 2,
-  fontSize: 9.5,
-  fontWeight: 900,
-  color: '#0f172a',
-};
-
-const aiBoxStyle: React.CSSProperties = {
-  marginTop: 10,
-  borderRadius: 14,
-  background: '#fff7ed',
-  border: '1px solid #fed7aa',
-  padding: '10px 12px',
-};
-
-const aiTitleStyle: React.CSSProperties = {
-  margin: '0 0 5px',
-  fontSize: 12,
-  fontWeight: 900,
-  color: '#c2410c',
-};
-
-const aiTextStyle: React.CSSProperties = {
-  margin: 0,
-  fontSize: 10.5,
-  lineHeight: 1.5,
-  color: '#475569',
-};
-
-const conclusionStyle: React.CSSProperties = {
-  marginTop: 10,
-  borderRadius: 12,
-  background: '#eff6ff',
-  border: '1px solid #bfdbfe',
-  padding: '9px 12px',
-  display: 'flex',
-  alignItems: 'center',
-  gap: 9,
-};
-
-const conclusionIconStyle: React.CSSProperties = {
-  width: 30,
-  height: 30,
-  borderRadius: 9,
-  background: '#2563eb',
-  color: '#ffffff',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 18,
-  flexShrink: 0,
-};
-
-const conclusionTextStyle: React.CSSProperties = {
-  fontSize: 10.5,
-  lineHeight: 1.45,
-  color: '#1e3a8a',
-};
-
-const bottomNavStyle: React.CSSProperties = {
-  marginTop: 8,
-  display: 'flex',
-  justifyContent: 'center',
-  gap: 6,
-};
-
-const pageNavButtonStyle: React.CSSProperties = {
-  width: 28,
-  height: 28,
-  borderRadius: 8,
-  border: '1px solid #dbe3ef',
-  background: '#ffffff',
-  color: '#64748b',
-  cursor: 'pointer',
-  fontSize: 11,
-  fontWeight: 800,
-};
-
-const activePageNavStyle: React.CSSProperties = {
-  ...pageNavButtonStyle,
-  background: '#2563eb',
-  borderColor: '#2563eb',
-  color: '#ffffff',
-};
-
-const footerStyle: React.CSSProperties = {
-  marginTop: 6,
-  display: 'flex',
-  justifyContent: 'space-between',
-  color: '#94a3b8',
-  fontSize: 8.5,
-};
-
-/* =========================================================
-   숫자 포맷
-========================================================= */
-
-function formatMoney(value: number) {
-  if (!value) return '0만원';
-  return `${value.toLocaleString()}만원`;
+      <div style={rightButtonsStyle}>
+        <button
+          onClick={() => window.print()}
+          style={navButtonStyle}
+        >
+          🖨️ 인쇄
+        </button>
+      </div>
+    </div>
+  );
 }
 
 /* =========================================================
-   메인
+   페이지 이동
+========================================================= */
+
+function PageNavigation() {
+  const router = useRouter();
+
+  return (
+    <div className="no-print" style={pageNavigationStyle}>
+      <button
+        onClick={() => router.push('/new/proposal')}
+        style={{
+          ...pageNumberButtonStyle,
+          background: '#2563eb',
+          color: '#ffffff',
+        }}
+      >
+        1
+      </button>
+
+      <button
+        onClick={() => router.push('/new/priority')}
+        style={pageNumberButtonStyle}
+      >
+        2
+      </button>
+
+      <button
+        onClick={() => router.push('/new/plan')}
+        style={pageNumberButtonStyle}
+      >
+        3
+      </button>
+
+      <button
+        onClick={() => router.push('/new/trend')}
+        style={pageNumberButtonStyle}
+      >
+        4
+      </button>
+    </div>
+  );
+}
+
+/* =========================================================
+   메인 페이지
 ========================================================= */
 
 export default function ProposalPage() {
-  const router = useRouter();
-
-  const [customer, setCustomer] = useState<CustomerInfo>({
-    name: '김민수',
-    age: 38,
-    gender: '남성',
-    occupation: '사무직',
-    spouse: '배우자',
-    children: '자녀 2명',
-    familyHistory: '위암(父), 고혈압(母)',
-  });
-
-  const [coverage, setCoverage] =
-    useState<CoverageData>(defaultCoverage);
-
-  /* =======================================================
-     보장분석 페이지에서 저장한 데이터를 가져옴
-  ======================================================= */
-
-  useEffect(() => {
-    try {
-      const savedCustomer =
-        localStorage.getItem('lifecare_customer');
-
-      const savedCoverage =
-        localStorage.getItem('lifecare_coverage');
-
-      if (savedCustomer) {
-        const parsed = JSON.parse(savedCustomer);
-
-        setCustomer((prev) => ({
-          ...prev,
-          ...parsed,
-        }));
-      }
-
-      if (savedCoverage) {
-        const parsed = JSON.parse(savedCoverage);
-
-        setCoverage((prev) => ({
-          ...prev,
-          ...parsed,
-        }));
-      }
-    } catch (error) {
-      console.error('저장된 고객 데이터를 불러오지 못했습니다.', error);
-    }
-  }, []);
-
-  /* =======================================================
-     그래프 데이터
-  ======================================================= */
-
-  const labels = useMemo(() => {
-    return [
-      `암\n(${formatMoney(coverage.cancer)})`,
-      `뇌혈관\n(${formatMoney(coverage.brain)})`,
-      `심장질환\n(${formatMoney(coverage.heart)})`,
-      `수술비\n(${formatMoney(coverage.surgery)})`,
-      `상해\n(${formatMoney(coverage.accident)})`,
-    ];
-  }, [coverage]);
-
-  /*
-    현재 가입금액을 목표금액 대비 %로 환산.
-    예:
-    암 3,000만원 / 목표 5,000만원 = 60
-  */
-
-  const coverageLevel = {
-    cancer: Math.min(
-      100,
-      (coverage.cancer / recommendedCoverage.cancer) * 100
-    ),
-    brain: Math.min(
-      100,
-      (coverage.brain / recommendedCoverage.brain) * 100
-    ),
-    heart: Math.min(
-      100,
-      (coverage.heart / recommendedCoverage.heart) * 100
-    ),
-    surgery: Math.min(
-      100,
-      (coverage.surgery / recommendedCoverage.surgery) * 100
-    ),
-    accident: Math.min(
-      100,
-      (coverage.accident / recommendedCoverage.accident) * 100
-    ),
-  };
-
-  const radarData = {
-    labels,
-    datasets: [
-      {
-        label: '예상 위험도',
-        data: [
-          riskData.cancer,
-          riskData.brain,
-          riskData.heart,
-          riskData.surgery,
-          riskData.accident,
-        ],
-        backgroundColor: 'rgba(37, 99, 235, 0.16)',
-        borderColor: '#2563eb',
-        borderWidth: 2,
-        pointBackgroundColor: '#2563eb',
-        pointBorderColor: '#ffffff',
-        pointRadius: 3,
-      },
-      {
-        label: '현재 보장 수준',
-        data: [
-          coverageLevel.cancer,
-          coverageLevel.brain,
-          coverageLevel.heart,
-          coverageLevel.surgery,
-          coverageLevel.accident,
-        ],
-        backgroundColor: 'rgba(234, 88, 12, 0.12)',
-        borderColor: '#ea580c',
-        borderWidth: 2,
-        pointBackgroundColor: '#ea580c',
-        pointBorderColor: '#ffffff',
-        pointRadius: 3,
-      },
-    ],
-  };
-
-  /*
-    Chart.js 타입 문제를 피하기 위해 any 사용.
-    이전에 발생했던 weight: "600" 타입 오류도 방지.
-  */
-
-  const radarOptions: any = {
-    responsive: true,
-    maintainAspectRatio: false,
-
-    animation: false,
-
-    scales: {
-      r: {
-        min: 0,
-        max: 100,
-
-        ticks: {
-          display: false,
-          stepSize: 20,
-        },
-
-        grid: {
-          color: '#dbe5f5',
-        },
-
-        angleLines: {
-          color: '#dbe5f5',
-        },
-
-        pointLabels: {
-          color: '#334155',
-
-          font: {
-            size: 9,
-            weight: 'bold',
-          },
-        },
-      },
-    },
-
-    plugins: {
-      legend: {
-        display: true,
-
-        position: 'bottom',
-
-        labels: {
-          boxWidth: 10,
-          boxHeight: 10,
-          padding: 10,
-          font: {
-            size: 9,
-          },
-        },
-      },
-
-      tooltip: {
-        enabled: true,
-
-        callbacks: {
-          label: function (context: any) {
-            const index = context.dataIndex;
-
-            const currentAmounts = [
-              coverage.cancer,
-              coverage.brain,
-              coverage.heart,
-              coverage.surgery,
-              coverage.accident,
-            ];
-
-            if (context.datasetIndex === 0) {
-              return ` 위험도: ${context.raw}%`;
-            }
-
-            return ` 현재 보장: ${formatMoney(
-              currentAmounts[index]
-            )} / 목표 ${formatMoney(
-              [
-                recommendedCoverage.cancer,
-                recommendedCoverage.brain,
-                recommendedCoverage.heart,
-                recommendedCoverage.surgery,
-                recommendedCoverage.accident,
-              ][index]
-            )}`;
-          },
-        },
-      },
-    },
-  };
-
-  /* =======================================================
-     위험도 설명
-  ======================================================= */
-
-  const explanations = [
-    {
-      title: '암 위험도 매우 높음',
-      text: `현재 ${formatMoney(
-        coverage.cancer
-      )}의 암 보장이 있으나, 가족력과 연령을 고려하면 경제적 손실 가능성이 커 충분한 진단자금 확보가 중요합니다.`,
-    },
-    {
-      title: '뇌혈관 위험도 높음',
-      text: `${customer.age}세 전후부터 뇌혈관 질환에 대한 관심이 커지는 시기이며, 현재 보장 수준이 목표 보장 대비 부족한 것으로 분석됩니다.`,
-    },
-    {
-      title: '심장질환 위험도 높음',
-      text: '허혈성 심장질환과 심근경색은 치료비뿐 아니라 소득 공백까지 고려해야 하므로 진단자금 확보가 중요합니다.',
-    },
-    {
-      title: '수술비 위험도 중간',
-      text: '수술은 반복적으로 발생할 가능성이 있어 진단비와 별도로 실제 치료 과정에서 활용할 수 있는 수술비를 함께 검토할 필요가 있습니다.',
-    },
-    {
-      title: '상해 위험도 낮음',
-      text: '현재 고객의 직업 및 생활환경을 고려하면 상대적으로 낮게 분석되지만, 사고에 대한 기본적인 보장은 유지하는 것이 좋습니다.',
-    },
-  ];
-
-  /* =======================================================
-     AI 분석 코멘트
-  ======================================================= */
-
-  const aiComment = `
-고객님의 현재 연령과 직업, 가족구성 및 가족력을 종합적으로 고려했을 때
-암과 뇌혈관·심장질환에 대한 보장을 우선적으로 점검할 필요가 있습니다.
-
-현재 가입되어 있는 보장과 예상 위험도를 함께 비교해보면 일부 보장은
-위험도에 비해 상대적으로 부족한 부분이 확인됩니다.
-
-따라서 기존 보험을 무조건 추가하기보다는 현재 가입되어 있는 보험을
-먼저 정리하고 부족한 영역을 우선적으로 보완하는 방식이 효율적입니다.
-  `.trim();
-
-  /* =======================================================
-     페이지 이동
-  ======================================================= */
-
-  const goPage = (page: number) => {
-    if (page === 1) {
-      router.push('/new/proposal');
-    }
-
-    if (page === 2) {
-      router.push('/new/priority');
-    }
-
-    if (page === 3) {
-      router.push('/new/plan');
-    }
-
-    if (page === 4) {
-      router.push('/new/trend');
-    }
-  };
-
-  /* =======================================================
-     PDF 저장
-  ======================================================= */
-
-  const savePDF = () => {
-    window.print();
-  };
-
   return (
     <>
+      <style jsx global>{`
+        @page {
+          size: A4 portrait;
+          margin: 0;
+        }
+
+        html,
+        body {
+          margin: 0;
+          padding: 0;
+          background: #eef3f9;
+        }
+
+        * {
+          box-sizing: border-box;
+        }
+
+        @media print {
+          html,
+          body {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+          }
+
+          body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          .no-print {
+            display: none !important;
+          }
+
+          .proposal-page {
+            width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            max-height: 297mm !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 10mm !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+          }
+        }
+      `}</style>
+
       <main style={mainStyle}>
-        {/* =================================================
-            화면용 버튼
-            인쇄할 때는 모두 숨김
-        ================================================= */}
+        <NavigationButtons />
 
-        <div className="no-print" style={topBarStyle}>
-          <div style={leftButtonsStyle}>
-            <button
-              style={buttonStyle}
-              onClick={() => router.push('/new/coverage')}
-            >
-              🛡️ 보장분석
-            </button>
-          </div>
+        <div className="proposal-page" style={proposalPageStyle}>
 
-          <div style={centerButtonsStyle}>
-            <button
-              style={mainButtonStyle}
-              onClick={() => router.push('/')}
-            >
-              🏠 메인
-            </button>
-          </div>
+          {/* =================================================
+              HEADER
+          ================================================= */}
 
-          <div style={rightButtonsStyle}>
-            <button
-              style={pdfButtonStyle}
-              onClick={savePDF}
-            >
-              📄 PDF 저장
-            </button>
-
-            <button
-              style={printButtonStyle}
-              onClick={() => window.print()}
-            >
-              🖨️ 인쇄
-            </button>
-          </div>
-        </div>
-
-        {/* =================================================
-            A4 페이지
-        ================================================= */}
-
-        <section style={pageStyle}>
-          {/* HEADER */}
-
-          <div style={pageHeaderStyle}>
-            <div style={logoAreaStyle}>
+          <section style={headerStyle}>
+            <div style={headerLeftStyle}>
               <div style={logoStyle}>🛡️</div>
 
               <div>
@@ -860,323 +377,673 @@ export default function ProposalPage() {
               </div>
             </div>
 
-            <div style={customerBoxStyle}>
+            <div style={customerBadgeStyle}>
               <div style={customerNameStyle}>
-                {customer.name || '고객님'}
+                {customer.name} ({customer.age}세)
               </div>
 
-              <div style={customerMetaStyle}>
-                {customer.age}세 · {customer.gender}
-              </div>
-            </div>
-          </div>
-
-          {/* 고객 인적사항 */}
-
-          <div>
-            <div style={sectionTitleWrapStyle}>
-              <div style={blueBarStyle} />
-
-              <h2 style={sectionTitleStyle}>
-                고객 인적사항 및 가족 현황
-              </h2>
-            </div>
-
-            <div style={customerInfoStyle}>
-              <div style={infoItemStyle}>
-                <div style={infoLabelStyle}>
-                  연령
-                </div>
-
-                <div style={infoValueStyle}>
-                  {customer.age}세
-                </div>
-              </div>
-
-              <div style={infoItemStyle}>
-                <div style={infoLabelStyle}>
-                  성별
-                </div>
-
-                <div style={infoValueStyle}>
-                  {customer.gender}
-                </div>
-              </div>
-
-              <div style={infoItemStyle}>
-                <div style={infoLabelStyle}>
-                  직업
-                </div>
-
-                <div style={infoValueStyle}>
-                  {customer.occupation}
-                </div>
-              </div>
-
-              <div style={infoItemStyle}>
-                <div style={infoLabelStyle}>
-                  가족사항
-                </div>
-
-                <div style={infoValueStyle}>
-                  {customer.spouse || '없음'}
-                  {customer.children
-                    ? ` · ${customer.children}`
-                    : ''}
-                </div>
-              </div>
-
-              <div
-                style={{
-                  ...infoItemStyle,
-                  borderRight: 'none',
-                }}
-              >
-                <div style={infoLabelStyle}>
-                  가족력
-                </div>
-
-                <div style={infoValueStyle}>
-                  {customer.familyHistory || '특이사항 없음'}
-                </div>
+              <div style={customerInfoStyle}>
+                {customer.gender} · {customer.job}
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* 주요 보장 위험도 분석 */}
+          {/* =================================================
+              고객 인적사항
+          ================================================= */}
 
-          <div style={analysisSectionStyle}>
-            <div style={sectionTitleWrapStyle}>
-              <div style={blueBarStyle} />
+          <section style={sectionStyle}>
+            <h2 style={sectionTitleStyle}>
+              👤 고객 인적사항 및 가족 현황
+            </h2>
 
-              <h2 style={sectionTitleStyle}>
-                주요 보장 위험도 분석
-              </h2>
+            <div style={customerInfoGridStyle}>
+              <InfoBox
+                icon="🎂"
+                label="연령"
+                value={`${customer.age}세`}
+              />
+
+              <InfoBox
+                icon="💼"
+                label="직업"
+                value={customer.job}
+              />
+
+              <InfoBox
+                icon="👨‍👩‍👧"
+                label="가족사항"
+                value={customer.family}
+              />
+
+              <InfoBox
+                icon="❤️"
+                label="가족력"
+                value={customer.familyHistory}
+              />
             </div>
+          </section>
 
-            <div style={analysisGridStyle}>
-              {/* 그래프 */}
+          {/* =================================================
+              위험도 분석 + 현재 보장
+          ================================================= */}
 
-              <div style={chartCardStyle}>
-                <div style={chartTitleStyle}>
-                  위험도와 현재 가입 보장을 한눈에 비교
+          <section style={sectionStyle}>
+            <h2 style={sectionTitleStyle}>
+              📊 주요 보장 위험도 분석
+            </h2>
+
+            <div style={analysisLayoutStyle}>
+
+              {/* Radar */}
+              <div style={radarCardStyle}>
+                <div style={radarTitleStyle}>
+                  고객 위험도
                 </div>
 
-                <div
-                  style={{
-                    height: 245,
-                    position: 'relative',
-                  }}
-                >
+                <div style={radarWrapStyle}>
                   <Radar
                     data={radarData}
                     options={radarOptions}
                   />
                 </div>
+
+                <div style={riskScaleStyle}>
+                  <span style={{ color: '#16a34a' }}>
+                    낮음
+                  </span>
+
+                  <span style={{ color: '#2563eb' }}>
+                    보통
+                  </span>
+
+                  <span style={{ color: '#f97316' }}>
+                    높음
+                  </span>
+
+                  <span style={{ color: '#ef4444' }}>
+                    매우 높음
+                  </span>
+                </div>
               </div>
 
-              {/* 설명 */}
+              {/* 현재 가입 보장 표 */}
+              <div style={coverageTableCardStyle}>
+                <div style={tableTitleStyle}>
+                  현재 가입 보장 현황
+                </div>
 
-              <div style={explanationCardStyle}>
-                <h3 style={explanationTitleStyle}>
-                  💡 왜 이렇게 판단했을까요?
-                </h3>
+                <div style={tableDescriptionStyle}>
+                  현재 가입금액과 권장금액을 비교하여 부족한 보장을 확인합니다.
+                </div>
 
-                {explanations.map((item, index) => (
-                  <div
-                    key={index}
-                    style={explanationItemStyle}
-                  >
-                    <span style={explanationIconStyle}>
-                      ✓
+                <table style={coverageTableStyle}>
+                  <thead>
+                    <tr>
+                      <th style={thStyle}>보장</th>
+                      <th style={thStyle}>현재</th>
+                      <th style={thStyle}>AI 권장</th>
+                      <th style={thStyle}>설계사 권장</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {coverageData.map((item) => {
+                      const shortage = item.ai - item.current;
+
+                      return (
+                        <tr key={item.key}>
+                          <td style={tdTitleStyle}>
+                            {item.label}
+                          </td>
+
+                          <td style={tdStyle}>
+                            {item.current.toLocaleString()}만원
+                          </td>
+
+                          <td style={tdStyle}>
+                            {item.ai.toLocaleString()}만원
+                          </td>
+
+                          <td style={tdAdvisorStyle}>
+                            {item.advisor.toLocaleString()}만원
+                          </td>
+
+                          <td
+                            style={{
+                              ...statusTdStyle,
+                              color:
+                                shortage > 0
+                                  ? '#ef4444'
+                                  : '#16a34a',
+                            }}
+                          >
+                            {shortage > 0
+                              ? `+${shortage.toLocaleString()}`
+                              : '충분'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+                <div style={tableNoteStyle}>
+                  ※ AI 권장금액은 고객의 연령·직업·가족구성·가족력 및
+                  현재 보장현황을 종합하여 산출하는 참고 기준입니다.
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =================================================
+              왜 이렇게 판단했을까요?
+          ================================================= */}
+
+          <section style={reasonSectionStyle}>
+            <h2 style={sectionTitleStyle}>
+              💡 왜 이렇게 판단했을까요?
+            </h2>
+
+            <div style={reasonGridStyle}>
+              {riskReasons.map((reason) => (
+                <div
+                  key={reason.title}
+                  style={reasonCardStyle}
+                >
+                  <div style={reasonHeaderStyle}>
+                    <strong>{reason.title}</strong>
+
+                    <span
+                      style={{
+                        ...reasonLevelStyle,
+                        color: getRiskColor(reason.level),
+                        background:
+                          getRiskBackground(reason.level),
+                      }}
+                    >
+                      {reason.level}
                     </span>
-
-                    <div style={explanationTextStyle}>
-                      <strong>{item.title}</strong>
-                      <br />
-                      {item.text}
-                    </div>
                   </div>
-                ))}
-              </div>
+
+                  <p style={bodyTextStyle}>
+                    {reason.text}
+                  </p>
+                </div>
+              ))}
             </div>
+          </section>
 
-            {/* 현재 가입금액 요약 */}
+          {/* =================================================
+              AI 종합 분석
+          ================================================= */}
 
-            <div style={coverageSummaryStyle}>
-              <div style={coverageSummaryTitleStyle}>
-                현재 가입 보장금액
-              </div>
+          <section style={aiSectionStyle}>
+            <div style={aiHeaderStyle}>
+              <div style={aiIconStyle}>✨</div>
 
-              <div style={coverageSummaryGridStyle}>
-                <div style={coverageMiniStyle}>
-                  <div style={coverageMiniLabelStyle}>
-                    암
-                  </div>
+              <div>
+                <h2 style={aiTitleStyle}>
+                  AI 종합 분석 코멘트
+                </h2>
 
-                  <div style={coverageMiniValueStyle}>
-                    {formatMoney(coverage.cancer)}
-                  </div>
-                </div>
-
-                <div style={coverageMiniStyle}>
-                  <div style={coverageMiniLabelStyle}>
-                    뇌혈관
-                  </div>
-
-                  <div style={coverageMiniValueStyle}>
-                    {formatMoney(coverage.brain)}
-                  </div>
-                </div>
-
-                <div style={coverageMiniStyle}>
-                  <div style={coverageMiniLabelStyle}>
-                    심장
-                  </div>
-
-                  <div style={coverageMiniValueStyle}>
-                    {formatMoney(coverage.heart)}
-                  </div>
-                </div>
-
-                <div style={coverageMiniStyle}>
-                  <div style={coverageMiniLabelStyle}>
-                    수술비
-                  </div>
-
-                  <div style={coverageMiniValueStyle}>
-                    {formatMoney(coverage.surgery)}
-                  </div>
-                </div>
-
-                <div style={coverageMiniStyle}>
-                  <div style={coverageMiniLabelStyle}>
-                    상해
-                  </div>
-
-                  <div style={coverageMiniValueStyle}>
-                    {formatMoney(coverage.accident)}
-                  </div>
+                <div style={aiSubtitleStyle}>
+                  고객님의 현재 보장과 위험요인을 종합적으로 분석했습니다.
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* AI 분석 코멘트 */}
-
-          <div style={aiBoxStyle}>
-            <h3 style={aiTitleStyle}>
-              🤖 AI 종합 분석 코멘트
-            </h3>
 
             <p style={aiTextStyle}>
               {aiComment}
             </p>
-          </div>
+          </section>
 
-          {/* 최종 한줄 */}
+          {/* =================================================
+              FOOTER
+          ================================================= */}
 
-          <div style={conclusionStyle}>
-            <div style={conclusionIconStyle}>
-              🎯
-            </div>
-
-            <div style={conclusionTextStyle}>
-              <strong>
-                고객님에게는 모든 보장을 다 넣는 것보다,
-                현재 위험도와 부족한 보장을 확인하고
-                우선순위를 정해 준비하는 것이 중요합니다.
-              </strong>
-            </div>
-          </div>
-
-          {/* 페이지 이동 */}
-
-          <div
-            className="no-print"
-            style={bottomNavStyle}
-          >
-            {[1, 2, 3, 4].map((page) => (
-              <button
-                key={page}
-                onClick={() => goPage(page)}
-                style={
-                  page === 1
-                    ? activePageNavStyle
-                    : pageNavButtonStyle
-                }
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-
-          {/* Footer */}
-
-          <div style={footerStyle}>
-            <span>LifeCare Insight</span>
+          <footer style={footerStyle}>
+            <span>1 / 4</span>
 
             <span>
-              1 / 4 · 상담용 제안서
+              LifeCare Insight · 상담용 제안서
             </span>
-          </div>
-        </section>
+          </footer>
+        </div>
+
+        <PageNavigation />
       </main>
-
-      {/* =====================================================
-          인쇄 전용 CSS
-      ===================================================== */}
-
-      <style jsx global>{`
-        @page {
-          size: A4 portrait;
-          margin: 0;
-        }
-
-        @media print {
-          html,
-          body {
-            width: 210mm !important;
-            height: 297mm !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-          }
-
-          body {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-
-          .no-print {
-            display: none !important;
-          }
-
-          main {
-            width: 210mm !important;
-            height: 297mm !important;
-            min-height: 297mm !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-          }
-
-          section {
-            width: 210mm !important;
-            height: 297mm !important;
-            max-width: none !important;
-            margin: 0 !important;
-            padding: 9mm !important;
-            box-sizing: border-box !important;
-            box-shadow: none !important;
-            overflow: hidden !important;
-          }
-
-          button {
-            display: none !important;
-          }
-        }
-      `}</style>
     </>
   );
 }
+
+/* =========================================================
+   작은 컴포넌트
+========================================================= */
+
+function InfoBox({
+  icon,
+  label,
+  value,
+}: {
+  icon: string;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div style={infoBoxStyle}>
+      <div style={infoIconStyle}>{icon}</div>
+
+      <div>
+        <div style={infoLabelStyle}>{label}</div>
+        <div style={infoValueStyle}>{value}</div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   위험도 색상
+========================================================= */
+
+function getRiskColor(level: string) {
+  if (level === '매우 높음') return '#ef4444';
+  if (level === '높음') return '#f97316';
+  if (level === '중간') return '#2563eb';
+  return '#16a34a';
+}
+
+function getRiskBackground(level: string) {
+  if (level === '매우 높음') return '#fee2e2';
+  if (level === '높음') return '#ffedd5';
+  if (level === '중간') return '#dbeafe';
+  return '#dcfce7';
+}
+
+/* =========================================================
+   STYLE
+========================================================= */
+
+const mainStyle = {
+  minHeight: '100vh',
+  background: '#eef3f9',
+  padding: '16px',
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+};
+
+const proposalPageStyle = {
+  width: '210mm',
+  minHeight: '297mm',
+  maxWidth: '100%',
+  margin: '0 auto',
+  background: '#ffffff',
+  padding: '16px',
+  borderRadius: 18,
+  boxShadow: '0 10px 30px rgba(15,23,42,0.08)',
+  overflow: 'hidden',
+};
+
+const topBarStyle = {
+  maxWidth: '210mm',
+  margin: '0 auto 14px',
+  display: 'grid',
+  gridTemplateColumns: '1fr auto 1fr',
+  alignItems: 'center',
+};
+
+const leftButtonsStyle = {
+  display: 'flex',
+  justifyContent: 'flex-start',
+};
+
+const centerButtonStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+};
+
+const rightButtonsStyle = {
+  display: 'flex',
+  justifyContent: 'flex-end',
+};
+
+const navButtonStyle = {
+  background: '#ffffff',
+  border: '1px solid #dbe3f0',
+  borderRadius: 10,
+  padding: '9px 14px',
+  cursor: 'pointer',
+  fontSize: 13,
+  fontWeight: 700,
+  color: '#334155',
+};
+
+const headerStyle = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: 16,
+  paddingBottom: 12,
+  borderBottom: '1px solid #e2e8f0',
+};
+
+const headerLeftStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+};
+
+const logoStyle = {
+  width: 48,
+  height: 48,
+  borderRadius: 15,
+  background: '#2563eb',
+  color: '#ffffff',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 25,
+  flexShrink: 0,
+};
+
+const smallTitleStyle = {
+  color: '#475569',
+  fontSize: 11,
+  fontWeight: 700,
+};
+
+const mainTitleStyle = {
+  margin: '2px 0 0',
+  fontSize: 25,
+  lineHeight: 1.1,
+  color: '#0f172a',
+};
+
+const headerDescriptionStyle = {
+  margin: '5px 0 0',
+  fontSize: 11,
+  color: '#64748b',
+};
+
+const customerBadgeStyle = {
+  background: '#f8fafc',
+  border: '1px solid #e2e8f0',
+  borderRadius: 12,
+  padding: '10px 14px',
+  minWidth: 150,
+};
+
+const customerNameStyle = {
+  fontSize: 14,
+  fontWeight: 800,
+  color: '#0f172a',
+};
+
+const customerInfoStyle = {
+  marginTop: 3,
+  fontSize: 10,
+  color: '#64748b',
+};
+
+const sectionStyle = {
+  marginTop: 13,
+};
+
+const sectionTitleStyle = {
+  margin: '0 0 8px',
+  fontSize: 15,
+  fontWeight: 800,
+  color: '#0f172a',
+};
+
+const customerInfoGridStyle = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(4, 1fr)',
+  border: '1px solid #dbeafe',
+  borderRadius: 12,
+  overflow: 'hidden',
+};
+
+const infoBoxStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  padding: '10px 9px',
+  borderRight: '1px solid #e2e8f0',
+  minWidth: 0,
+};
+
+const infoIconStyle = {
+  fontSize: 18,
+  flexShrink: 0,
+};
+
+const infoLabelStyle = {
+  fontSize: 9,
+  color: '#64748b',
+};
+
+const infoValueStyle = {
+  marginTop: 2,
+  fontSize: 11,
+  fontWeight: 800,
+  color: '#0f172a',
+  whiteSpace: 'nowrap' as const,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+};
+
+const analysisLayoutStyle = {
+  display: 'grid',
+  gridTemplateColumns: '0.95fr 1.25fr',
+  gap: 12,
+  alignItems: 'stretch',
+};
+
+const radarCardStyle = {
+  border: '1px solid #dbeafe',
+  borderRadius: 14,
+  padding: 10,
+  background: '#fbfdff',
+};
+
+const radarTitleStyle = {
+  fontSize: 13,
+  fontWeight: 800,
+  color: '#0f172a',
+  textAlign: 'center' as const,
+};
+
+const radarWrapStyle = {
+  height: 235,
+  marginTop: 2,
+};
+
+const riskScaleStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+  gap: 10,
+  fontSize: 9,
+  fontWeight: 700,
+};
+
+const coverageTableCardStyle = {
+  border: '1px solid #e2e8f0',
+  borderRadius: 14,
+  padding: 12,
+  background: '#ffffff',
+};
+
+const tableTitleStyle = {
+  fontSize: 13,
+  fontWeight: 800,
+  color: '#0f172a',
+};
+
+const tableDescriptionStyle = {
+  marginTop: 3,
+  marginBottom: 8,
+  fontSize: 9,
+  color: '#64748b',
+};
+
+const coverageTableStyle = {
+  width: '100%',
+  borderCollapse: 'collapse' as const,
+  fontSize: 9,
+};
+
+const thStyle = {
+  background: '#f8fafc',
+  borderBottom: '1px solid #cbd5e1',
+  padding: '7px 4px',
+  textAlign: 'center' as const,
+  fontWeight: 800,
+  color: '#475569',
+};
+
+const tdStyle = {
+  borderBottom: '1px solid #e2e8f0',
+  padding: '7px 3px',
+  textAlign: 'center' as const,
+  color: '#334155',
+};
+
+const tdTitleStyle = {
+  ...tdStyle,
+  textAlign: 'left' as const,
+  fontWeight: 800,
+  color: '#0f172a',
+};
+
+const tdAdvisorStyle = {
+  ...tdStyle,
+  fontWeight: 800,
+  color: '#2563eb',
+};
+
+const statusTdStyle = {
+  ...tdStyle,
+  fontWeight: 800,
+};
+
+const tableNoteStyle = {
+  marginTop: 7,
+  fontSize: 8,
+  lineHeight: 1.4,
+  color: '#94a3b8',
+};
+
+const reasonSectionStyle = {
+  marginTop: 12,
+};
+
+const reasonGridStyle = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(2, 1fr)',
+  gap: 7,
+};
+
+const reasonCardStyle = {
+  border: '1px solid #e2e8f0',
+  borderRadius: 10,
+  padding: 9,
+  background: '#ffffff',
+};
+
+const reasonHeaderStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 8,
+  fontSize: 11,
+  color: '#0f172a',
+};
+
+const reasonLevelStyle = {
+  padding: '3px 7px',
+  borderRadius: 999,
+  fontSize: 8,
+  fontWeight: 800,
+};
+
+const bodyTextStyle = {
+  fontSize: 10,
+  lineHeight: 1.45,
+  color: '#334155',
+  margin: '6px 0 0',
+};
+
+const aiSectionStyle = {
+  marginTop: 10,
+  borderRadius: 13,
+  border: '1px solid #ddd6fe',
+  background: '#faf5ff',
+  padding: 12,
+};
+
+const aiHeaderStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+};
+
+const aiIconStyle = {
+  width: 30,
+  height: 30,
+  borderRadius: 9,
+  background: '#7c3aed',
+  color: '#ffffff',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 15,
+};
+
+const aiTitleStyle = {
+  margin: 0,
+  fontSize: 13,
+  color: '#6d28d9',
+};
+
+const aiSubtitleStyle = {
+  marginTop: 2,
+  fontSize: 9,
+  color: '#7c3aed',
+};
+
+const aiTextStyle = {
+  margin: '8px 0 0',
+  fontSize: 10,
+  lineHeight: 1.55,
+  color: '#334155',
+};
+
+const footerStyle = {
+  marginTop: 10,
+  paddingTop: 8,
+  borderTop: '1px solid #e5e7eb',
+  display: 'flex',
+  justifyContent: 'space-between',
+  color: '#94a3b8',
+  fontSize: 9,
+};
+
+const pageNavigationStyle = {
+  maxWidth: '210mm',
+  margin: '14px auto 0',
+  display: 'flex',
+  justifyContent: 'center',
+  gap: 7,
+};
+
+const pageNumberButtonStyle = {
+  width: 34,
+  height: 34,
+  borderRadius: 9,
+  border: '1px solid #dbe3f0',
+  background: '#ffffff',
+  color: '#475569',
+  fontWeight: 800,
+  cursor: 'pointer',
+};
