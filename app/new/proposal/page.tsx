@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import type { CSSProperties } from 'react';
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -214,6 +215,7 @@ export default function ProposalPage() {
 
       <div className="no-print" style={toolbarStyle}>
         <button
+          type="button"
           onClick={() => router.push('/new/coverage')}
           style={leftButtonStyle}
         >
@@ -221,6 +223,7 @@ export default function ProposalPage() {
         </button>
 
         <button
+          type="button"
           onClick={() => router.push('/')}
           style={centerButtonStyle}
         >
@@ -228,17 +231,11 @@ export default function ProposalPage() {
         </button>
 
         <div style={rightButtonGroupStyle}>
-          <button
-            onClick={handlePrint}
-            style={normalButtonStyle}
-          >
+          <button type="button" onClick={handlePrint} style={normalButtonStyle}>
             📄 PDF 저장
           </button>
 
-          <button
-            onClick={handlePrint}
-            style={normalButtonStyle}
-          >
+          <button type="button" onClick={handlePrint} style={normalButtonStyle}>
             🖨️ 인쇄
           </button>
         </div>
@@ -300,25 +297,10 @@ export default function ProposalPage() {
 
                 <div style={infoListStyle}>
 
-                  <InfoRow
-                    label="연령"
-                    value={`${CUSTOMER.age}세`}
-                  />
-
-                  <InfoRow
-                    label="직업"
-                    value={CUSTOMER.job}
-                  />
-
-                  <InfoRow
-                    label="가족사항"
-                    value={CUSTOMER.family}
-                  />
-
-                  <InfoRow
-                    label="가족력"
-                    value={CUSTOMER.familyHistory}
-                  />
+                  <InfoRow label="연령" value={`${CUSTOMER.age}세`} />
+                  <InfoRow label="직업" value={CUSTOMER.job} />
+                  <InfoRow label="가족사항" value={CUSTOMER.family} />
+                  <InfoRow label="가족력" value={CUSTOMER.familyHistory} />
 
                 </div>
               </section>
@@ -382,31 +364,15 @@ export default function ProposalPage() {
               {/* 차트 범례 */}
 
               <div style={legendStyle}>
-
-                <LegendItem
-                  color="#2563eb"
-                  label="예상 위험도"
-                />
-
-                <LegendItem
-                  color="#ef4444"
-                  label="현재 가입 수준"
-                />
-
-                <LegendItem
-                  color="#94a3b8"
-                  label="동일 연령대 평균"
-                />
-
+                <LegendItem color="#2563eb" label="예상 위험도" />
+                <LegendItem color="#ef4444" label="현재 가입 수준" />
+                <LegendItem color="#94a3b8" label="동일 연령대 평균" />
               </div>
 
               {/* 레이더 차트 */}
 
               <div style={chartContainerStyle}>
-                <Radar
-                  data={radarData}
-                  options={radarOptions}
-                />
+                <Radar data={radarData} options={radarOptions} />
               </div>
 
               {/* 차트 설명 */}
@@ -417,7 +383,6 @@ export default function ProposalPage() {
                   <strong style={{ color: '#2563eb' }}>
                     🔵 예상 위험도
                   </strong>
-
                   <span>
                     연령·직업·가족력 등을 고려한 상대적 위험 수준
                   </span>
@@ -427,7 +392,6 @@ export default function ProposalPage() {
                   <strong style={{ color: '#ef4444' }}>
                     🔴 현재 가입 수준
                   </strong>
-
                   <span>
                     현재 가입한 보장금액을 권장금액과 비교한 수준
                   </span>
@@ -437,7 +401,6 @@ export default function ProposalPage() {
                   <strong style={{ color: '#64748b' }}>
                     ⚪ 동일 연령대 평균
                   </strong>
-
                   <span>
                     비슷한 연령대에서 일반적으로 준비하는 보장 수준
                   </span>
@@ -477,59 +440,77 @@ export default function ProposalPage() {
                         <th style={thStyle}>현재</th>
                         <th style={thStyle}>연령대</th>
                         <th style={thStyle}>권장</th>
+                        <th style={thStyle}>가입 수준</th>
                       </tr>
                     </thead>
 
                     <tbody>
-                      {COVERAGE.map((item) => (
-                        <tr key={item.name}>
+                      {COVERAGE.map((item) => {
+                        const enrollRate = Math.min(
+                          Math.round((item.current / item.recommended) * 100),
+                          100
+                        );
 
-                          <td style={tdStrongStyle}>
-                            {item.name}
-                          </td>
+                        return (
+                          <tr key={item.name}>
 
-                          <td
-                            style={{
-                              ...tdStyle,
-                              color:
-                                item.risk >= 80
-                                  ? '#ef4444'
-                                  : item.risk >= 60
-                                  ? '#f97316'
-                                  : '#2563eb',
-                              fontWeight: 800,
-                            }}
-                          >
-                            {item.risk}
-                          </td>
+                            <td style={tdStrongStyle}>
+                              {item.name}
+                            </td>
 
-                          <td style={tdStyle}>
-                            {item.current.toLocaleString()}
-                          </td>
+                            <td
+                              style={{
+                                ...tdStyle,
+                                color:
+                                  item.risk >= 80
+                                    ? '#ef4444'
+                                    : item.risk >= 60
+                                    ? '#f97316'
+                                    : '#2563eb',
+                                fontWeight: 800,
+                              }}
+                            >
+                              {item.risk}
+                            </td>
 
-                          <td style={tdStyle}>
-                            {item.average.toLocaleString()}
-                          </td>
+                            <td style={tdStyle}>
+                              {item.current.toLocaleString()}
+                            </td>
 
-                          <td
-                            style={{
-                              ...tdStyle,
-                              fontWeight: 800,
-                              color: '#2563eb',
-                            }}
-                          >
-                            {item.recommended.toLocaleString()}
-                          </td>
+                            <td style={tdStyle}>
+                              {item.average.toLocaleString()}
+                            </td>
 
-                        </tr>
-                      ))}
+                            <td
+                              style={{
+                                ...tdStyle,
+                                fontWeight: 800,
+                                color: '#2563eb',
+                              }}
+                            >
+                              {item.recommended.toLocaleString()}
+                            </td>
+
+                            <td
+                              style={{
+                                ...tdStyle,
+                                fontWeight: 800,
+                                color: enrollRate < 50 ? '#ef4444' : '#f97316',
+                              }}
+                            >
+                              {enrollRate}%
+                            </td>
+
+                          </tr>
+                        );
+                      })}
                     </tbody>
 
                   </table>
                 </div>
 
                 <p style={tableNoteStyle}>
-                  ※ 현재 가입금액과 권장금액을 비교하여 부족한 보장을 확인할 수 있습니다.
+                  ※ 가입 수준(%) = 현재 가입금액 ÷ 권장 보장금액 × 100
                 </p>
 
               </section>
@@ -545,10 +526,7 @@ export default function ProposalPage() {
                 <div style={reasonListStyle}>
 
                   {COVERAGE.map((item) => (
-                    <div
-                      key={item.name}
-                      style={reasonItemStyle}
-                    >
+                    <div key={item.name} style={reasonItemStyle}>
                       <span style={checkStyle}>✓</span>
 
                       <div>
@@ -602,10 +580,8 @@ export default function ProposalPage() {
           ================================================= */}
 
           <div style={bottomMessageStyle}>
-            🎯 고객님에게는 모든 것을 다 넣는 것보다,
-            <strong>
-              가장 중요한 위험부터 순서대로 준비하는 것
-            </strong>
+            🎯 고객님에게는 모든 것을 다 넣는 것보다,{' '}
+            <strong>가장 중요한 위험부터 순서대로 준비하는 것</strong>
             이 더 현명합니다.
           </div>
 
@@ -613,11 +589,9 @@ export default function ProposalPage() {
               페이지 이동
           ================================================= */}
 
-          <div
-            className="no-print"
-            style={paginationStyle}
-          >
+          <div className="no-print" style={paginationStyle}>
             <button
+              type="button"
               onClick={() => router.push('/new/proposal')}
               style={activePageButtonStyle}
             >
@@ -625,6 +599,7 @@ export default function ProposalPage() {
             </button>
 
             <button
+              type="button"
               onClick={() => router.push('/new/priority')}
               style={pageButtonStyle}
             >
@@ -632,6 +607,7 @@ export default function ProposalPage() {
             </button>
 
             <button
+              type="button"
               onClick={() => router.push('/new/plan')}
               style={pageButtonStyle}
             >
@@ -639,6 +615,7 @@ export default function ProposalPage() {
             </button>
 
             <button
+              type="button"
               onClick={() => router.push('/new/trend')}
               style={pageButtonStyle}
             >
@@ -727,42 +704,19 @@ export default function ProposalPage() {
    작은 컴포넌트
 ========================================================= */
 
-function InfoRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div style={infoRowStyle}>
-      <span style={infoLabelStyle}>
-        {label}
-      </span>
-
-      <strong style={infoValueStyle}>
-        {value}
-      </strong>
+      <span style={infoLabelStyle}>{label}</span>
+      <strong style={infoValueStyle}>{value}</strong>
     </div>
   );
 }
 
-function LegendItem({
-  color,
-  label,
-}: {
-  color: string;
-  label: string;
-}) {
+function LegendItem({ color, label }: { color: string; label: string }) {
   return (
     <div style={legendItemStyle}>
-      <span
-        style={{
-          ...legendDotStyle,
-          background: color,
-        }}
-      />
-
+      <span style={{ ...legendDotStyle, background: color }} />
       <span>{label}</span>
     </div>
   );
@@ -770,9 +724,10 @@ function LegendItem({
 
 /* =========================================================
    스타일
+   (모든 객체를 CSSProperties로 명시해 리터럴 유니온 타입 오류 방지)
 ========================================================= */
 
-const toolbarStyle = {
+const toolbarStyle: CSSProperties = {
   width: 'min(1470px, calc(100% - 32px))',
   margin: '10px auto',
   display: 'grid',
@@ -781,7 +736,7 @@ const toolbarStyle = {
   gap: 12,
 };
 
-const leftButtonStyle = {
+const leftButtonStyle: CSSProperties = {
   justifySelf: 'start',
   background: 'white',
   border: '1px solid #dbe5f1',
@@ -792,7 +747,7 @@ const leftButtonStyle = {
   cursor: 'pointer',
 };
 
-const centerButtonStyle = {
+const centerButtonStyle: CSSProperties = {
   justifySelf: 'center',
   background: 'white',
   border: '1px solid #dbe5f1',
@@ -803,13 +758,13 @@ const centerButtonStyle = {
   cursor: 'pointer',
 };
 
-const rightButtonGroupStyle = {
+const rightButtonGroupStyle: CSSProperties = {
   justifySelf: 'end',
   display: 'flex',
   gap: 8,
 };
 
-const normalButtonStyle = {
+const normalButtonStyle: CSSProperties = {
   background: 'white',
   border: '1px solid #dbe5f1',
   borderRadius: 12,
@@ -819,13 +774,13 @@ const normalButtonStyle = {
   cursor: 'pointer',
 };
 
-const screenBackgroundStyle = {
+const screenBackgroundStyle: CSSProperties = {
   minHeight: 'calc(100vh - 70px)',
   background: '#f4f7fb',
   padding: '8px 16px 20px',
 };
 
-const proposalPageStyle = {
+const proposalPageStyle: CSSProperties = {
   width: 'min(1470px, calc(100vw - 32px))',
   aspectRatio: '297 / 210',
   minHeight: 700,
@@ -836,24 +791,24 @@ const proposalPageStyle = {
   padding: 22,
   boxShadow: '0 8px 30px rgba(15,23,42,0.06)',
   display: 'flex',
-  flexDirection: 'column' as const,
+  flexDirection: 'column',
   overflow: 'hidden',
 };
 
-const headerStyle = {
+const headerStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
   marginBottom: 12,
 };
 
-const headerLeftStyle = {
+const headerLeftStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 14,
 };
 
-const logoStyle = {
+const logoStyle: CSSProperties = {
   width: 52,
   height: 52,
   borderRadius: 16,
@@ -864,13 +819,13 @@ const logoStyle = {
   fontSize: 28,
 };
 
-const smallTitleStyle = {
+const smallTitleStyle: CSSProperties = {
   fontSize: 12,
   color: '#475569',
   fontWeight: 700,
 };
 
-const mainTitleStyle = {
+const mainTitleStyle: CSSProperties = {
   margin: '1px 0',
   fontSize: 25,
   lineHeight: 1.15,
@@ -878,20 +833,20 @@ const mainTitleStyle = {
   fontWeight: 900,
 };
 
-const headerSubStyle = {
+const headerSubStyle: CSSProperties = {
   margin: 0,
   fontSize: 11,
   color: '#64748b',
 };
 
-const dateStyle = {
+const dateStyle: CSSProperties = {
   fontSize: 13,
   fontWeight: 700,
   color: '#1e3a8a',
-  whiteSpace: 'nowrap' as const,
+  whiteSpace: 'nowrap',
 };
 
-const contentGridStyle = {
+const contentGridStyle: CSSProperties = {
   flex: 1,
   minHeight: 0,
   display: 'grid',
@@ -899,21 +854,21 @@ const contentGridStyle = {
   gap: 10,
 };
 
-const leftColumnStyle = {
+const leftColumnStyle: CSSProperties = {
   minHeight: 0,
   display: 'flex',
-  flexDirection: 'column' as const,
+  flexDirection: 'column',
   gap: 10,
 };
 
-const rightColumnStyle = {
+const rightColumnStyle: CSSProperties = {
   minHeight: 0,
   display: 'flex',
-  flexDirection: 'column' as const,
+  flexDirection: 'column',
   gap: 10,
 };
 
-const cardStyle = {
+const cardStyle: CSSProperties = {
   background: '#ffffff',
   border: '1px solid #dbe5f1',
   borderRadius: 14,
@@ -921,26 +876,26 @@ const cardStyle = {
   minHeight: 0,
 };
 
-const centerCardStyle = {
+const centerCardStyle: CSSProperties = {
   ...cardStyle,
   display: 'flex',
-  flexDirection: 'column' as const,
+  flexDirection: 'column',
   overflow: 'hidden',
 };
 
-const cardTitleStyle = {
+const cardTitleStyle: CSSProperties = {
   margin: 0,
   fontSize: 15,
   fontWeight: 900,
   color: '#0f3b8f',
 };
 
-const infoListStyle = {
+const infoListStyle: CSSProperties = {
   marginTop: 10,
   borderTop: '1px solid #eef2f7',
 };
 
-const infoRowStyle = {
+const infoRowStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -949,80 +904,79 @@ const infoRowStyle = {
   borderBottom: '1px solid #eef2f7',
 };
 
-const infoLabelStyle = {
+const infoLabelStyle: CSSProperties = {
   fontSize: 11,
   color: '#64748b',
 };
 
-const infoValueStyle = {
+const infoValueStyle: CSSProperties = {
   fontSize: 12,
   color: '#0f172a',
-  textAlign: 'right' as const,
+  textAlign: 'right',
 };
 
-const riskBoxStyle = {
+const riskBoxStyle: CSSProperties = {
   marginTop: 12,
   borderRadius: 12,
   background: 'linear-gradient(135deg,#fffaf0,#fff7ed)',
   padding: '18px 10px',
-  textAlign: 'center' as const,
+  textAlign: 'center',
 };
 
-const riskLabelStyle = {
+const riskLabelStyle: CSSProperties = {
   fontSize: 11,
   color: '#64748b',
   fontWeight: 700,
 };
 
-const riskValueStyle = {
+const riskValueStyle: CSSProperties = {
   marginTop: 4,
   fontSize: 28,
   fontWeight: 900,
   color: '#ef4444',
 };
 
-const riskScoreStyle = {
+const riskScoreStyle: CSSProperties = {
   marginTop: 4,
   fontSize: 11,
   color: '#64748b',
 };
 
-const bodyTextStyle = {
+const bodyTextStyle: CSSProperties = {
   fontSize: 13,
   lineHeight: 1.55,
   color: '#334155',
 };
 
-const riskBarStyle = {
+const riskBarStyle: CSSProperties = {
   height: 9,
   borderRadius: 999,
   overflow: 'hidden',
-  background:
-    'linear-gradient(90deg,#86efac,#fde68a,#fb923c,#fecaca)',
+  background: 'linear-gradient(90deg,#86efac,#fde68a,#fb923c,#fecaca)',
   marginTop: 12,
 };
 
-const riskBarFillStyle = {
+const riskBarFillStyle: CSSProperties = {
   height: '100%',
   background: 'rgba(239,68,68,0.72)',
   borderRadius: 999,
 };
 
-const descriptionStyle = {
+const descriptionStyle: CSSProperties = {
   margin: '5px 0 6px',
   fontSize: 10,
   color: '#64748b',
 };
 
-const legendStyle = {
+const legendStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'center',
-  flexWrap: 'wrap' as const,
+  flexWrap: 'wrap',
   gap: 18,
   marginBottom: 2,
 };
 
-const legendItemStyle = {
+const legendItemStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 6,
@@ -1031,29 +985,29 @@ const legendItemStyle = {
   fontWeight: 700,
 };
 
-const legendDotStyle = {
+const legendDotStyle: CSSProperties = {
   width: 9,
   height: 9,
   borderRadius: '50%',
 };
 
-const chartContainerStyle = {
+const chartContainerStyle: CSSProperties = {
   flex: 1,
   minHeight: 0,
-  position: 'relative' as const,
+  position: 'relative',
   marginTop: 2,
 };
 
-const chartDescriptionGridStyle = {
+const chartDescriptionGridStyle: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(3, 1fr)',
   gap: 6,
   marginTop: 5,
 };
 
-const chartDescriptionBoxStyle = {
+const chartDescriptionBoxStyle: CSSProperties = {
   display: 'flex',
-  flexDirection: 'column' as const,
+  flexDirection: 'column',
   gap: 3,
   padding: '7px 8px',
   background: '#f8fafc',
@@ -1063,31 +1017,31 @@ const chartDescriptionBoxStyle = {
   color: '#64748b',
 };
 
-const tableHeaderStyle = {
+const tableHeaderStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
 };
 
-const unitStyle = {
+const unitStyle: CSSProperties = {
   fontSize: 9,
   color: '#94a3b8',
 };
 
-const tableWrapperStyle = {
+const tableWrapperStyle: CSSProperties = {
   marginTop: 8,
   overflow: 'hidden',
   borderRadius: 8,
   border: '1px solid #dbe5f1',
 };
 
-const tableStyle = {
+const tableStyle: CSSProperties = {
   width: '100%',
-  borderCollapse: 'collapse' as const,
-  tableLayout: 'fixed' as const,
+  borderCollapse: 'collapse',
+  tableLayout: 'fixed',
 };
 
-const thStyle = {
+const thStyle: CSSProperties = {
   background: '#eff6ff',
   color: '#1e3a8a',
   fontSize: 9,
@@ -1097,8 +1051,8 @@ const thStyle = {
   borderBottom: '1px solid #dbe5f1',
 };
 
-const tdStyle = {
-  textAlign: 'center' as const,
+const tdStyle: CSSProperties = {
+  textAlign: 'center',
   fontSize: 9,
   color: '#334155',
   padding: '6px 3px',
@@ -1106,13 +1060,13 @@ const tdStyle = {
   borderBottom: '1px solid #e2e8f0',
 };
 
-const tdStrongStyle = {
+const tdStrongStyle: CSSProperties = {
   ...tdStyle,
   fontWeight: 800,
   color: '#0f172a',
 };
 
-const tableNoteStyle = {
+const tableNoteStyle: CSSProperties = {
   margin: '6px 0 0',
   padding: '5px 7px',
   background: '#f8fafc',
@@ -1121,13 +1075,13 @@ const tableNoteStyle = {
   color: '#64748b',
 };
 
-const reasonListStyle = {
+const reasonListStyle: CSSProperties = {
   marginTop: 8,
   display: 'grid',
   gap: 6,
 };
 
-const reasonItemStyle = {
+const reasonItemStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'flex-start',
   gap: 7,
@@ -1136,7 +1090,7 @@ const reasonItemStyle = {
   color: '#475569',
 };
 
-const checkStyle = {
+const checkStyle: CSSProperties = {
   width: 17,
   height: 17,
   borderRadius: '50%',
@@ -1149,58 +1103,58 @@ const checkStyle = {
   flexShrink: 0,
 };
 
-const reasonTitleStyle = {
+const reasonTitleStyle: CSSProperties = {
   display: 'block',
   color: '#0f172a',
   fontSize: 10,
   marginBottom: 1,
 };
 
-const reasonTextStyle = {
+const reasonTextStyle: CSSProperties = {
   display: 'block',
 };
 
-const aiCardStyle = {
+const aiCardStyle: CSSProperties = {
   ...cardStyle,
   background: '#faf5ff',
   borderColor: '#ddd6fe',
   flex: 1,
 };
 
-const aiTitleStyle = {
+const aiTitleStyle: CSSProperties = {
   margin: 0,
   fontSize: 14,
   color: '#5b21b6',
   fontWeight: 900,
 };
 
-const aiTextStyle = {
+const aiTextStyle: CSSProperties = {
   margin: '7px 0 0',
   fontSize: 9,
   lineHeight: 1.5,
   color: '#475569',
 };
 
-const bottomMessageStyle = {
+const bottomMessageStyle: CSSProperties = {
   marginTop: 10,
   padding: '8px 14px',
   background: '#fff9e8',
   border: '1px solid #f6d365',
   borderRadius: 10,
-  textAlign: 'center' as const,
+  textAlign: 'center',
   color: '#334155',
   fontSize: 11,
   lineHeight: 1.4,
 };
 
-const paginationStyle = {
+const paginationStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'center',
   gap: 7,
   marginTop: 8,
 };
 
-const pageButtonStyle = {
+const pageButtonStyle: CSSProperties = {
   width: 26,
   height: 26,
   borderRadius: 7,
@@ -1212,7 +1166,7 @@ const pageButtonStyle = {
   cursor: 'pointer',
 };
 
-const activePageButtonStyle = {
+const activePageButtonStyle: CSSProperties = {
   ...pageButtonStyle,
   background: '#2563eb',
   color: 'white',
